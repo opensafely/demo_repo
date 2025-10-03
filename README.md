@@ -1,5 +1,7 @@
 # demo_repo
 
+This project will serve as both additional teaching materials for project pipelines within OS, which vary in complexity (using branches). As well as serving as an investigation into inhaler prescribing behaviours surrounding the pandemic.
+
 [View on OpenSAFELY](https://jobs.opensafely.org/repo/https%253A%252F%252Fgithub.com%252Fopensafely%252Fdemo_repo)
 
 Details of the purpose and any published outputs from this project can be found at the link above.
