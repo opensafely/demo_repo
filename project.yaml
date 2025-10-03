@@ -2,7 +2,12 @@ version: '4.0'
 
 actions:
   generate_dataset:
-    run: ehrql:v1 generate-dataset analysis/dataset_definition.py --output output/dataset.csv.gz
+    run: >
+        ehrql:v1 generate-dataset
+        analysis/dataset_definition.py
+        --test-data-file analysis/test_dataset_definition.py
+        --output outputs/dataset.arrow
     outputs:
       highly_sensitive:
+        population: outputs/dataset.arrow
         dataset: output/dataset.csv.gz

@@ -34,8 +34,8 @@ dataset.define_population(
 )
 
 ## define patient info to extract
-dataset.sex = patients.sex # sex
 dataset.age = patients.age_on(index_date) # age at start of follow up
+dataset.sex = patients.sex # sex
 dataset.asthma = has_prior_event(codelists.ast_diag, index_date) # whether the patient has been diagnosed with asthma - this can be made more complex by looking at prescriptions etc
 dataset.copd = has_prior_event(codelists.copd_diag, index_date) # whether the patient has been diagnosed with COPD - this can be made more complex by looking for resolution codes
 dataset.salbutamol_quantity_y1 = ( # number of inhalers prescribed in first year of follow up 
