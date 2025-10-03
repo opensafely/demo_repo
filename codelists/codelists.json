@@ -1,3 +1,28 @@
 {
-  "files": {}
+  "files": {
+    "pincer-ast.csv": {
+      "id": "pincer/ast/v1.8",
+      "url": "https://www.opencodelists.org/codelist/pincer/ast/v1.8/",
+      "downloaded_at": "2025-10-03 11:05:30.085369Z",
+      "sha": "76d8ff9674484e54bfe68fa9e4ffdb8b11daf835"
+    },
+    "nhsd-primary-care-domain-refsets-copd_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/copd_cod/20250627",
+      "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/copd_cod/20250627/",
+      "downloaded_at": "2025-10-03 11:05:30.177711Z",
+      "sha": "e7ff15f6e5d3ae560f40799d46d917e01216ebb9"
+    },
+    "opensafely-asthma-inhaler-salbutamol-medication.csv": {
+      "id": "opensafely/asthma-inhaler-salbutamol-medication/2020-04-15",
+      "url": "https://www.opencodelists.org/codelist/opensafely/asthma-inhaler-salbutamol-medication/2020-04-15/",
+      "downloaded_at": "2025-10-03 11:05:30.285688Z",
+      "sha": "1938865a29f7db8993532aba4d0cde68117c643b"
+    },
+    "opensafely-asthma-annual-review-qof.csv": {
+      "id": "opensafely/asthma-annual-review-qof/33eeb7da",
+      "url": "https://www.opencodelists.org/codelist/opensafely/asthma-annual-review-qof/33eeb7da/",
+      "downloaded_at": "2025-10-03 11:05:30.370558Z",
+      "sha": "6f6f0221706d28a49d74f3c3edc5c627d2cc618c"
+    }
+  }
 }
