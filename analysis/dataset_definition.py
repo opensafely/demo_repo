@@ -7,6 +7,7 @@ from variable_lib import ( # import variables which are defined in a separate fi
 import codelists # import the codelists defined in a separate file
 
 dataset = create_dataset() # create ehrQL generated dummy dataset
+dataset.configure_dummy_data(population_size = 250) # define the size of a dummy population
 
 index_date = "2020-03-01" # define start of follow up period
 
@@ -22,10 +23,14 @@ age_of_interest = (
     (patients.age_on(index_date) >= 12) & (patients.age_on(index_date) <= 100)
 )
 
+# define the patients with known sex
+sex_known = patients.sex.is_in(["female", "male", "intersex"]) 
+
 # define the population of interest for study
 dataset.define_population(
     registered_patients
     & age_of_interest
+    & sex_known
 )
 
 ## define patient info to extract
