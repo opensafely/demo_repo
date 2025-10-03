@@ -19,7 +19,7 @@ registered_patients = (
 
 # define the patients who are of the correct age
 age_of_interest = (
-    patients.age_on(index_date) >= 12 & patients.age_on(index_date) <= 100
+    (patients.age_on(index_date) >= 12) & (patients.age_on(index_date) <= 100)
 )
 
 # define the population of interest for study
