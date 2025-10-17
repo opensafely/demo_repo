@@ -20,72 +20,84 @@ test_data = {
             }
         ],
         "clinical_events": [
+            #Ethnicity
             {
-                # Asthma diagnosis
+                "date": date(2017, 2, 13),
+                "snomedct_code": "733446001"
+            },
+            # Asthma diagnosis
+            {
                 "date": date(2012, 8, 12),
                 "snomedct_code": "195967001",
             }
         ],
         "medications": [
+            # Relevant Asthma Steroid Medication
+            {
+                "date": date(2019, 12, 1),
+                "dmd_code": "10983311000001107"
+            },
+
             # First year of inhalers
             {
                 "date": date(2020, 4, 1),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             {
                 "date": date(2020, 6, 6),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             {
                 "date": date(2020, 8, 12),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             {
                 "date": date(2020, 10, 1),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             {
                 "date": date(2021, 2, 1),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             # Second year of inhalers
             {
                 "date": date(2021, 4, 1),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             {
                 "date": date(2021, 5, 1),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             {
                 "date": date(2021, 6, 6),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             {
                 "date": date(2021, 8, 12),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             {
                 "date": date(2021, 10, 1),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             {
                 "date": date(2021, 12, 1),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             {
                 "date": date(2022, 1, 15),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
             {
                 "date": date(2022, 2, 21),
-                "dmd_code" : "840111000001107",
+                "dmd_code" : "3214311000001108",
             },
         ],
         "expected_in_population": True,
         "expected_columns": {
-            "sex": "female",
             "age": 74,
+            "sex": "female",
+            "latest_ethnicity_group": "1", # White
             "asthma": True, # Asthma diagnosis
             "copd": False, # COPD diagnosis not present
             "salbutamol_quantity_y1": 5, # First year of inhalers
@@ -106,16 +118,24 @@ test_data = {
                 "sex": "male"
             }
         ],
-        "clinical_events": [],
+        "clinical_events": [
+            # Ethnicity
+            {
+                "date": date(2019, 8, 10),
+                "snomedct_code": "85371009"
+            }
+        ],
         "medications": [
             {
                 "date": date(2020, 6, 21),
-                "dmd_code" : "840111000001107", 
+                "dmd_code" : "3214311000001108", 
             }
         ],
         "expected_in_population": True,
         "expected_columns": {
             "age": 40,
+            "sex": "male",
+            "latest_ethnicity_group": "4", # Black or Black British
             "asthma": False,
             "copd": False,
             "salbutamol_quantity_y1": 1, # First year of inhalers

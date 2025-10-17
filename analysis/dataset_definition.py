@@ -1,17 +1,32 @@
-from ehrql import create_dataset, months, years # import the necessary ehrQL functionalities
-from ehrql.tables.tpp import patients, medications #,addresses # import the necessary tables from TPP
-from variable_lib import ( # import variables which are defined in a separate file
+# import the necessary ehrQL functionalities
+from ehrql import create_dataset, months, years, case, when
+# import the necessary tables from TPP
+from ehrql.tables.tpp import patients, medications, clinical_events #,addresses 
+# import variables which are defined in a separate file
+from variable_lib import ( 
     has_a_continuous_practice_registration_spanning,
-    has_prior_event
+    has_prior_event,
+    has_prior_meds,
+    last_prior_event,
+    med_years
  )
-import codelists # import the codelists defined in a separate file
+# import the codelists defined in a separate file
+import codelists 
 
-dataset = create_dataset() # create ehrQL generated dummy dataset
-dataset.configure_dummy_data(population_size = 250) # define the size of a dummy population
+# create ehrQL generated dummy dataset
+dataset = create_dataset() 
 
-index_date = "2020-03-01" # define start of follow up period
+# define the size of a dummy population
+dataset.configure_dummy_data(population_size = 250) 
 
-registration_date = index_date - months(3) # define the start date for required registration period
+# define start of follow up period
+index_date = "2020-03-01" 
+
+# define end of follow up period
+end_date = "2022-02-28"
+
+# define the start date for required registration period
+registration_date = index_date - months(3) 
 
 # define the patients who have the required continuous registration (in this case 3 months)
 registered_patients = (
@@ -33,32 +48,90 @@ dataset.define_population(
     & sex_known
 )
 
-## define patient info to extract
-dataset.age = patients.age_on(index_date) # age at start of follow up
-dataset.sex = patients.sex # sex
-dataset.asthma = has_prior_event(codelists.ast_diag, index_date) # whether the patient has been diagnosed with asthma - this can be made more complex by looking at prescriptions etc
-dataset.copd = has_prior_event(codelists.copd_diag, index_date) # whether the patient has been diagnosed with COPD - this can be made more complex by looking for resolution codes
-dataset.salbutamol_quantity_y1 = ( # number of inhalers prescribed in first year of follow up 
-    medications.where(
-        medications.dmd_code.is_in(codelists.salbutamol)
-    ).where(
-        medications.date.is_on_or_between(index_date, index_date + years(1))
-    ).count_for_patient()
-)
-dataset.salbutamol_quantity_y2 = ( # number of inhalers prescribed in second year of follow up 
-    medications.where(
-        medications.dmd_code.is_in(codelists.salbutamol)
-    ).where(
-        medications.date.is_on_or_between(index_date + years(1), index_date + years(2))
-    ).count_for_patient()
+## define patient characteristics to extract
+
+# age at start of follow up
+dataset.age = patients.age_on(index_date) 
+
+# sex
+dataset.sex = patients.sex 
+
+# patient ethnicity (5 groups from 2001 census)
+dataset.latest_ethnicity_group = (
+    clinical_events.where(clinical_events.snomedct_code.is_in(codelists.ethnicity_codes))
+    .where(clinical_events.date.is_on_or_before(index_date))
+    .sort_by(clinical_events.date)
+    .last_for_patient().snomedct_code
+    .to_category(codelists.ethnicity_codes)
 )
 
 # potentially add
 # dataset.imd_rounded = addresses.for_patient_on(index_date).imd_rounded
-# dataset..latest_ethnicity_group = (
-#   clinical_events.where(clinical_events.snomedct_code.is_in(codelists.ethnicity_codes))
-#   .where(clinical_events.date.is_on_or_before(index_date))
-#   .sort_by(clinical_events.date)
-#   .last_for_patient().snomedct_code
-#   .to_category(codelists.ethnicity_codes)
-# )
+
+## define patient comorbidities to extract
+
+# define medication date to find recent prescriptions
+medication_date = index_date - years(1)
+
+# identify whether patient is asthmatic
+dataset.asthma =  (
+    # has a diagnosis code
+    (has_prior_event(codelists.asthma_codelist, index_date))
+    # and has been prescribed medications in year prior to index
+    & (
+        (has_prior_meds(codelists.asthma_oral_medications, index_date, # oral medications
+            where = medications.date.is_on_or_between(medication_date, index_date)))
+         |(has_prior_meds(codelists.asthma_inhaled_medications, index_date, # inhaled medications
+            where = medications.date.is_on_or_between(medication_date, index_date)))
+    )
+)
+
+# identify whether patient had COPD which has been resolved
+copd_res = (case(
+    # has a resolution code
+    when(last_prior_event(codelists.copd_resolved_codelist, index_date).date
+    # which is dated after the latest diagnosis code
+    .is_on_or_after(last_prior_event(codelists.copd_codelist, index_date).date))
+    .then(True),
+    # has a resolution code
+    when(last_prior_event(codelists.copd_resolved_codelist, index_date).date
+    # which is dated after the latest QoF code
+    .is_on_or_after(last_prior_event(codelists.copd_qof_codelist, index_date).date))
+    .then(True),
+    otherwise = False)
+)
+
+# identify whether patient has COPD
+dataset.copd = (case(
+    when(
+        (
+            # has a copd diagnosis code
+            (has_prior_event(codelists.copd_codelist, index_date)) 
+            # or has a copd review code
+            |(has_prior_event(codelists.copd_qof_codelist, index_date))
+        )
+        # and does not have COPD which has already been resolved
+        & (~copd_res)
+    )
+    .then(True),
+    otherwise = False)
+)
+
+## define patient medication information to extract
+
+# define the interval for inhalers for each year of study
+med_starts, med_ends = med_years(index_date, end_date, 2)   
+
+# number of inhaler prescriptions in year 1 of study
+dataset.salbutamol_quantity_y1 = (
+    medications.where(medications.dmd_code.is_in(codelists.salbutamol))
+    .where(medications.date.is_on_or_between(med_starts[0], med_ends[0]))
+    .count_for_patient()
+)
+
+# number of inhaler prescriptions in year 2 of study
+dataset.salbutamol_quantity_y2 = (
+    medications.where(medications.dmd_code.is_in(codelists.salbutamol))
+    .where(medications.date.is_on_or_between(med_starts[1], med_ends[1]))
+    .count_for_patient()
+)
