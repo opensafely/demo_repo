@@ -74,7 +74,7 @@ dataset.latest_ethnicity_group = (
 medication_date = index_date - years(1)
 
 # identify whether patient is asthmatic
-dataset.asthma =  (
+dataset.asthma = (
     # has a diagnosis code
     (has_prior_event(codelists.asthma_codelist, index_date))
     # and has been prescribed medications in year prior to index

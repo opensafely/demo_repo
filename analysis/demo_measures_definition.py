@@ -1,0 +1,120 @@
+# import the necessary ehrQL functionalities
+from ehrql import create_measures, years, case, when
+# import the measures functionality
+from ehrql.measures import INTERVAL
+# import the necessary tables from TPP
+from ehrql.tables.tpp import patients, medications
+# import variables which are defined in a separate file
+from variable_lib import ( 
+    has_prior_event,
+    has_prior_meds,
+    last_prior_event
+ )
+# import the codelists defined in a separate file
+import codelists
+
+# define start of follow up period
+index_date = "2020-03-01" 
+
+# define the interevals to be used for the measures
+intervals = years(2).starting_on(index_date)
+
+# create ehrQL generated dummy measures
+measures = create_measures()
+
+# define the size of a dummy population
+measures.configure_dummy_data(population_size = 250)
+
+# restrict prescriptions to those within intervals
+prescriptions_in_interval = medications.where(medications.date.is_during(INTERVAL))
+
+# now subset these to only be those for salbutamol
+relevant_prescriptions_in_interval = (
+    prescriptions_in_interval.where(medications.dmd_code.is_in(codelists.salbutamol))
+)
+
+# define the patients who fit this measure
+had_prescription = relevant_prescriptions_in_interval.exists_for_patient()
+
+# define medication date to find recent prescriptions
+medication_date = index_date - years(1)
+
+# identify whether patient is asthmatic
+asthma = (
+    # has a diagnosis code
+    (has_prior_event(codelists.asthma_codelist, index_date))
+    # and has been prescribed medications in year prior to index
+    & (
+        (has_prior_meds(codelists.asthma_oral_medications, index_date, # oral medications
+            where = medications.date.is_on_or_between(medication_date, index_date)))
+         |(has_prior_meds(codelists.asthma_inhaled_medications, index_date, # inhaled medications
+            where = medications.date.is_on_or_between(medication_date, index_date)))
+    )
+)
+
+# identify whether patient had COPD which has been resolved
+copd_res = (case(
+    # has a resolution code
+    when(last_prior_event(codelists.copd_resolved_codelist, index_date).date
+    # which is dated after the latest diagnosis code
+    .is_on_or_after(last_prior_event(codelists.copd_codelist, index_date).date))
+    .then(True),
+    # has a resolution code
+    when(last_prior_event(codelists.copd_resolved_codelist, index_date).date
+    # which is dated after the latest QoF code
+    .is_on_or_after(last_prior_event(codelists.copd_qof_codelist, index_date).date))
+    .then(True),
+    otherwise = False)
+)
+
+# identify whether patient has COPD
+copd = (case(
+    when(
+        (
+            # has a copd diagnosis code
+            (has_prior_event(codelists.copd_codelist, index_date)) 
+            # or has a copd review code
+            |(has_prior_event(codelists.copd_qof_codelist, index_date))
+        )
+        # and does not have COPD which has already been resolved
+        & (~copd_res)
+    )
+    .then(True),
+    otherwise = False)
+)
+
+# define whether the patient has asthma, copd, or none of the conditions of interest
+condition = (case(
+    when(asthma).then("asthma"),
+    when(copd).then("copd"),
+    otherwise = "none"
+))
+
+# define the measure of interest: those with salbutamol inhalers prescribed, by condition
+measures.define_measure(
+    "had_prescription_by_condition",
+    numerator = had_prescription,
+    denominator = patients.exists_for_patient(),
+    group_by = {"condition": condition},
+    intervals = intervals,
+)
+
+# define the quantity of prescriptions of salbutamol in interval
+salbutamol_quantity = (
+    relevant_prescriptions_in_interval.count_for_patient()
+)
+
+# define the patients who received multiple prescriptions in the interval
+had_multiple = (case(
+    when(salbutamol_quantity > 1).then(True),
+    otherwise = False
+))
+
+# define the measure of interest: those with multiple salbutamol inhalers prescribed, by condition
+measures.define_measure(
+    "had_multiple_inhalers_by_condition",
+    numerator = had_multiple,
+    denominator = patients.exists_for_patient(),
+    group_by = {"condition": condition},
+    intervals = intervals,
+)

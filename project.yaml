@@ -6,8 +6,16 @@ actions:
         ehrql:v1 generate-dataset
         analysis/dataset_definition.py
         --test-data-file analysis/test_dataset_definition.py
-        --output output/dataset.csv.gz
+        --output output/dataset.arrow
     outputs:
       highly_sensitive:
-        #population: outputs/dataset.arrow
-        dataset: output/dataset.csv.gz
+        population: output/dataset.arrow
+
+  generate_measures:
+    run: >
+        ehrql:v1 generate-measures
+        analysis/demo_measures_definition.py
+        --output output/demo_measures.csv
+    outputs:
+      moderately_sensitive:
+        dataset: output/demo_measures.csv
