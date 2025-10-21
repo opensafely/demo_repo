@@ -1,11 +1,12 @@
 # import the necessary ehrQL functionalities
-from ehrql import create_measures, years, case, when
+from ehrql import create_measures, years, case, when, months
 # import the measures functionality
 from ehrql.measures import INTERVAL
 # import the necessary tables from TPP
 from ehrql.tables.tpp import patients, medications
 # import variables which are defined in a separate file
 from variable_lib import ( 
+    has_a_continuous_practice_registration_spanning,
     has_prior_event,
     has_prior_meds,
     last_prior_event
@@ -15,6 +16,22 @@ import codelists
 
 # define start of follow up period
 index_date = "2020-03-01" 
+
+# define the start date for required registration period
+registration_date = index_date - months(3) 
+
+# define the patients who have the required continuous registration (in this case 3 months)
+registered_patients = (
+    has_a_continuous_practice_registration_spanning(registration_date, index_date)
+)
+
+# define the patients who are of the correct age
+age_of_interest = (
+    (patients.age_on(index_date) >= 12) & (patients.age_on(index_date) <= 100)
+)
+
+# define the patients with known sex
+sex_known = patients.sex.is_in(["female", "male", "intersex"]) 
 
 # define the interevals to be used for the measures
 intervals = years(2).starting_on(index_date)
@@ -94,7 +111,11 @@ condition = (case(
 measures.define_measure(
     "had_prescription_by_condition",
     numerator = had_prescription,
-    denominator = patients.exists_for_patient(),
+    denominator = (
+        registered_patients
+        & age_of_interest
+        & sex_known
+    ),
     group_by = {"condition": condition},
     intervals = intervals,
 )
@@ -114,7 +135,11 @@ had_multiple = (case(
 measures.define_measure(
     "had_multiple_inhalers_by_condition",
     numerator = had_multiple,
-    denominator = patients.exists_for_patient(),
+    denominator = (
+        registered_patients
+        & age_of_interest
+        & sex_known
+    ),
     group_by = {"condition": condition},
     intervals = intervals,
 )
