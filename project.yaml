@@ -11,11 +11,20 @@ actions:
       highly_sensitive:
         population: output/dataset.arrow
 
-  generate_measures:
+  generate_measures_conditions:
     run: >
         ehrql:v1 generate-measures
-        analysis/demo_measures_definition.py
-        --output output/demo_measures.csv
+        analysis/demo_measures_definition_conditions.py
+        --output output/demo_measures_conditions.csv
     outputs:
       moderately_sensitive:
-        dataset: output/demo_measures.csv
+        dataset: output/demo_measures_conditions.csv
+
+  generate_measures_ages:
+    run: >
+        ehrql:v1 generate-measures
+        analysis/demo_measures_definition_ages.py
+        --output output/demo_measures_ages.csv
+    outputs:
+      moderately_sensitive:
+        dataset: output/demo_measures_ages.csv
