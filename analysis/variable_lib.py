@@ -59,7 +59,7 @@ def med_years(index_date, end_date, year_number) :
     start_dates = []
     end_dates = []
     # define the relevant dates
-    for n in range(year_number) :
+    for n in range(year_number + 1):
         # set the start of study plus the number of years already accounted for (n - 1 years) 
         start = index_date + years(n - 1)
         if n == year_number :

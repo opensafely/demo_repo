@@ -41,11 +41,20 @@ age_of_interest = (
 # define the patients with known sex
 sex_known = patients.sex.is_in(["female", "male", "intersex"]) 
 
+# define the patients with an inhaler of interest in the two years preceding follow-up
+inhaler_date = index_date - years(2)
+inhaler_prescribed = (
+    medications.where(medications.dmd_code.is_in(codelists.salbutamol))
+    .where(medications.date.is_on_or_between(inhaler_date, index_date))
+    .exists_for_patient()
+)
+
 # define the population of interest for study
 dataset.define_population(
     registered_patients
     & age_of_interest
     & sex_known
+    & inhaler_prescribed
 )
 
 ## define patient characteristics to extract
@@ -125,13 +134,13 @@ med_starts, med_ends = med_years(index_date, end_date, 2)
 # number of inhaler prescriptions in year 1 of study
 dataset.salbutamol_quantity_y1 = (
     medications.where(medications.dmd_code.is_in(codelists.salbutamol))
-    .where(medications.date.is_on_or_between(med_starts[0], med_ends[0]))
+    .where(medications.date.is_on_or_between(med_starts[1], med_ends[1]))
     .count_for_patient()
 )
 
 # number of inhaler prescriptions in year 2 of study
 dataset.salbutamol_quantity_y2 = (
     medications.where(medications.dmd_code.is_in(codelists.salbutamol))
-    .where(medications.date.is_on_or_between(med_starts[1], med_ends[1]))
+    .where(medications.date.is_on_or_between(med_starts[2], med_ends[2]))
     .count_for_patient()
 )

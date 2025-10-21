@@ -1,10 +1,13 @@
+# import python functions
 from datetime import date
-from dataset_definition import dataset # import the dataset generation mechanism
+# import the dataset generation mechanism to test against
+from dataset_definition import dataset 
 
 # here we create three patients with which we can test our dataset definition
-# they have various values of age, sex, asthma/copd diagnosis and inhaler quantity
+# they have various values of age, sex, ethnicity, prescription history, asthma/copd diagnosis and inhaler quantity
 
 test_data = {
+
     # Expected in population with some quantity of inhalers each year
     1: {
         "practice_registrations": [
@@ -25,6 +28,7 @@ test_data = {
                 "date": date(2017, 2, 13),
                 "snomedct_code": "733446001"
             },
+
             # Asthma diagnosis
             {
                 "date": date(2012, 8, 12),
@@ -36,6 +40,12 @@ test_data = {
             {
                 "date": date(2019, 12, 1),
                 "dmd_code": "10983311000001107"
+            },
+
+            # Inhaler prescribed in two years preceding
+            {
+                "date": date(2018, 8, 1),
+                "dmd_code" : "3214311000001108",
             },
 
             # First year of inhalers
@@ -59,6 +69,7 @@ test_data = {
                 "date": date(2021, 2, 1),
                 "dmd_code" : "3214311000001108",
             },
+
             # Second year of inhalers
             {
                 "date": date(2021, 4, 1),
@@ -104,6 +115,7 @@ test_data = {
             "salbutamol_quantity_y2": 8 # Second year of inhalers
         },
     },
+
     # Expected in population without asthma or COPD but with an inhaler in first year
     2: {
         "practice_registrations": [
@@ -126,6 +138,13 @@ test_data = {
             }
         ],
         "medications": [
+            # Inhaler prescribed in two years preceding
+            {
+                "date": date(2018, 8, 1),
+                "dmd_code" : "3214311000001108",
+            },
+
+            # First year of inhalers
             {
                 "date": date(2020, 6, 21),
                 "dmd_code" : "3214311000001108", 
@@ -142,6 +161,7 @@ test_data = {
             "salbutamol_quantity_y2": 0 # Second year of inhalers
         },
     },
+    
     # Not expected in population
     3: {
         "practice_registrations": [
