@@ -22,9 +22,6 @@ import codelists
 # create ehrQL generated dummy dataset
 dataset = create_dataset() 
 
-# define the size of a dummy population
-dataset.configure_dummy_data(population_size = 250) 
-
 # define start of follow up period
 index_date = "2020-03-01" 
 
@@ -171,3 +168,9 @@ dataset.death_date = (case(
 
 # date of derigstration
 dataset.deregistration_date = practice_registrations.for_patient_on(index_date).end_date
+
+# define the size of a dummy population
+dataset.configure_dummy_data(
+    population_size = 100, timeout = 1000, 
+    additional_population_constraint = (index_date < dataset.death_date) & (inhaler_prescribed)
+) 

@@ -1,6 +1,9 @@
 version: '4.0'
 
 actions:
+
+  # action which creates dataset using ehrQL, will use ehrQL generated dummy data
+  # will also test the dataset definition automatically
   generate_dataset:
     run: >
         ehrql:v1 generate-dataset
@@ -11,6 +14,16 @@ actions:
       highly_sensitive:
         population: output/dataset.arrow
 
+  # action which will process the dataset from generate_dataset, so data is formatted as desired
+  process_dataset:
+    run: r:latest analysis/data_processing.R
+    needs:
+    - generate_dataset
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset_processed.arrow
+
+  # action which creates measure across conditions of interest, i.e., asthma and COPD
   generate_measures_conditions:
     run: >
         ehrql:v1 generate-measures
@@ -20,6 +33,7 @@ actions:
       moderately_sensitive:
         dataset: output/demo_measures_conditions.csv
 
+  # action which creates measure across ages groups, i.e., 12-17, 18-64, 65+
   generate_measures_ages:
     run: >
         ehrql:v1 generate-measures
