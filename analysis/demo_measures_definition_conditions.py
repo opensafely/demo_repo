@@ -3,7 +3,7 @@ from ehrql import create_measures, years, case, when, months
 # import the measures functionality
 from ehrql.measures import INTERVAL
 # import the necessary tables from TPP
-from ehrql.tables.tpp import patients, medications
+from ehrql.tables.tpp import patients, medications, ons_deaths
 # import variables which are defined in a separate file
 from variable_lib import ( 
     has_a_continuous_practice_registration_spanning,
@@ -32,6 +32,14 @@ age_of_interest = (
 
 # define the patients with known sex
 sex_known = patients.sex.is_in(["female", "male", "intersex"]) 
+
+# define population alive at start of interval of interest
+was_alive = (
+    (ons_deaths.date.is_after(INTERVAL.start_date))| # first using ONS deaths (best source)
+    (ons_deaths.date.is_null())|
+    (patients.date_of_death.is_after(INTERVAL.start_date))| # then using patient table
+    (patients.date_of_death.is_null())
+)
 
 # define the interevals to be used for the measures
 intervals = years(2).starting_on(index_date)
@@ -110,11 +118,18 @@ condition = (case(
 # define the measure of interest: those with salbutamol inhalers prescribed, by condition
 measures.define_measure(
     "had_prescription_by_condition",
-    numerator = had_prescription,
+    numerator = (
+        registered_patients
+        & age_of_interest
+        & sex_known
+        & was_alive
+        & had_prescription
+    ),
     denominator = (
         registered_patients
         & age_of_interest
         & sex_known
+        & was_alive
     ),
     group_by = {"condition": condition},
     intervals = intervals,
@@ -134,11 +149,18 @@ had_multiple = (case(
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by condition
 measures.define_measure(
     "had_multiple_inhalers_by_condition",
-    numerator = had_multiple,
+    numerator = (
+        had_multiple       
+        & age_of_interest
+        & sex_known
+        & was_alive
+        & had_prescription
+    ),
     denominator = (
         registered_patients
         & age_of_interest
         & sex_known
+        & was_alive
     ),
     group_by = {"condition": condition},
     intervals = intervals,

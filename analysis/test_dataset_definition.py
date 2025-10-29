@@ -13,13 +13,14 @@ test_data = {
         "practice_registrations": [
             {
                 "start_date": date(2017, 2, 13),
-                "end_date": None
+                "end_date": date(2023, 1, 15)
             }
        ],
         "patients": [
             {
                 "date_of_birth": date(1946, 2, 1),
-                "sex": "female"
+                "sex": "female",
+                "date_of_death": date(2023, 1, 12)
             }
         ],
         "clinical_events": [
@@ -104,6 +105,11 @@ test_data = {
                 "dmd_code" : "3214311000001108",
             },
         ],
+        "ons_deaths": [
+            {
+                "date": date(2023, 1, 12)
+            }
+        ],
         "expected_in_population": True,
         "expected_columns": {
             "age": 74,
@@ -112,7 +118,9 @@ test_data = {
             "asthma": True, # Asthma diagnosis
             "copd": False, # COPD diagnosis not present
             "salbutamol_quantity_y1": 5, # First year of inhalers
-            "salbutamol_quantity_y2": 8 # Second year of inhalers
+            "salbutamol_quantity_y2": 8, # Second year of inhalers
+            "death_date": date(2023, 1, 12),
+            "deregistration_date": date(2023, 1, 15)
         },
     },
 
@@ -150,6 +158,7 @@ test_data = {
                 "dmd_code" : "3214311000001108", 
             }
         ],
+        "ons_deaths": [],
         "expected_in_population": True,
         "expected_columns": {
             "age": 40,
@@ -158,7 +167,9 @@ test_data = {
             "asthma": False,
             "copd": False,
             "salbutamol_quantity_y1": 1, # First year of inhalers
-            "salbutamol_quantity_y2": 0 # Second year of inhalers
+            "salbutamol_quantity_y2": 0, # Second year of inhalers
+            "death_date": None,
+            "deregistration_date": date(2021, 1, 1)
         },
     },
     
@@ -178,6 +189,7 @@ test_data = {
         ],
         "clinical_events": [],
         "medications": [],
+        "ons_deaths": [],
         "expected_in_population": False,
     },
 }
