@@ -1,22 +1,26 @@
+# import python functions
 from datetime import date
-from dataset_definition import dataset # import the dataset generation mechanism
+# import the dataset generation mechanism to test against
+from dataset_definition import dataset 
 
 # here we create three patients with which we can test our dataset definition
-# they have various values of age, sex, asthma/copd diagnosis and inhaler quantity
+# they have various values of age, sex, ethnicity, prescription history, asthma/copd diagnosis and inhaler quantity
 
 test_data = {
+
     # Expected in population with some quantity of inhalers each year
     1: {
         "practice_registrations": [
             {
                 "start_date": date(2017, 2, 13),
-                "end_date": None
+                "end_date": date(2023, 1, 15)
             }
        ],
         "patients": [
             {
                 "date_of_birth": date(1946, 2, 1),
-                "sex": "female"
+                "sex": "female",
+                "date_of_death": date(2023, 1, 12)
             }
         ],
         "clinical_events": [
@@ -25,6 +29,7 @@ test_data = {
                 "date": date(2017, 2, 13),
                 "snomedct_code": "733446001"
             },
+
             # Asthma diagnosis
             {
                 "date": date(2012, 8, 12),
@@ -36,6 +41,12 @@ test_data = {
             {
                 "date": date(2019, 12, 1),
                 "dmd_code": "10983311000001107"
+            },
+
+            # Inhaler prescribed in two years preceding
+            {
+                "date": date(2018, 8, 1),
+                "dmd_code" : "3214311000001108",
             },
 
             # First year of inhalers
@@ -59,6 +70,7 @@ test_data = {
                 "date": date(2021, 2, 1),
                 "dmd_code" : "3214311000001108",
             },
+
             # Second year of inhalers
             {
                 "date": date(2021, 4, 1),
@@ -93,6 +105,11 @@ test_data = {
                 "dmd_code" : "3214311000001108",
             },
         ],
+        "ons_deaths": [
+            {
+                "date": date(2023, 1, 12)
+            }
+        ],
         "expected_in_population": True,
         "expected_columns": {
             "age": 74,
@@ -101,9 +118,12 @@ test_data = {
             "asthma": True, # Asthma diagnosis
             "copd": False, # COPD diagnosis not present
             "salbutamol_quantity_y1": 5, # First year of inhalers
-            "salbutamol_quantity_y2": 8 # Second year of inhalers
+            "salbutamol_quantity_y2": 8, # Second year of inhalers
+            "death_date": date(2023, 1, 12),
+            "deregistration_date": date(2023, 1, 15)
         },
     },
+
     # Expected in population without asthma or COPD but with an inhaler in first year
     2: {
         "practice_registrations": [
@@ -126,11 +146,19 @@ test_data = {
             }
         ],
         "medications": [
+            # Inhaler prescribed in two years preceding
+            {
+                "date": date(2018, 8, 1),
+                "dmd_code" : "3214311000001108",
+            },
+
+            # First year of inhalers
             {
                 "date": date(2020, 6, 21),
                 "dmd_code" : "3214311000001108", 
             }
         ],
+        "ons_deaths": [],
         "expected_in_population": True,
         "expected_columns": {
             "age": 40,
@@ -139,9 +167,12 @@ test_data = {
             "asthma": False,
             "copd": False,
             "salbutamol_quantity_y1": 1, # First year of inhalers
-            "salbutamol_quantity_y2": 0 # Second year of inhalers
+            "salbutamol_quantity_y2": 0, # Second year of inhalers
+            "death_date": None,
+            "deregistration_date": date(2021, 1, 1)
         },
     },
+    
     # Not expected in population
     3: {
         "practice_registrations": [
@@ -158,6 +189,7 @@ test_data = {
         ],
         "clinical_events": [],
         "medications": [],
+        "ons_deaths": [],
         "expected_in_population": False,
     },
 }

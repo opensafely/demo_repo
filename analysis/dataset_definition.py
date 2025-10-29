@@ -1,7 +1,13 @@
 # import the necessary ehrQL functionalities
 from ehrql import create_dataset, months, years, case, when
 # import the necessary tables from TPP
-from ehrql.tables.tpp import patients, medications, clinical_events #,addresses 
+from ehrql.tables.tpp import (
+    patients, medications,
+    clinical_events,
+    ons_deaths,
+    practice_registrations#,
+    #addresses 
+)
 # import variables which are defined in a separate file
 from variable_lib import ( 
     has_a_continuous_practice_registration_spanning,
@@ -41,11 +47,29 @@ age_of_interest = (
 # define the patients with known sex
 sex_known = patients.sex.is_in(["female", "male", "intersex"]) 
 
+# define the patients with an inhaler of interest in the two years preceding follow-up
+inhaler_date = index_date - years(2)
+inhaler_prescribed = (
+    medications.where(medications.dmd_code.is_in(codelists.salbutamol))
+    .where(medications.date.is_on_or_between(inhaler_date, index_date))
+    .exists_for_patient()
+)
+
+# define population alive at index date
+was_alive = (
+    (ons_deaths.date.is_after(index_date))| # first using ONS deaths (best source)
+    (ons_deaths.date.is_null())|
+    (patients.date_of_death.is_after(index_date))| # then using patient table
+    (patients.date_of_death.is_null())
+)
+
 # define the population of interest for study
 dataset.define_population(
     registered_patients
     & age_of_interest
     & sex_known
+    & inhaler_prescribed
+    & was_alive
 )
 
 ## define patient characteristics to extract
@@ -125,13 +149,25 @@ med_starts, med_ends = med_years(index_date, end_date, 2)
 # number of inhaler prescriptions in year 1 of study
 dataset.salbutamol_quantity_y1 = (
     medications.where(medications.dmd_code.is_in(codelists.salbutamol))
-    .where(medications.date.is_on_or_between(med_starts[0], med_ends[0]))
+    .where(medications.date.is_on_or_between(med_starts[1], med_ends[1]))
     .count_for_patient()
 )
 
 # number of inhaler prescriptions in year 2 of study
 dataset.salbutamol_quantity_y2 = (
     medications.where(medications.dmd_code.is_in(codelists.salbutamol))
-    .where(medications.date.is_on_or_between(med_starts[1], med_ends[1]))
+    .where(medications.date.is_on_or_between(med_starts[2], med_ends[2]))
     .count_for_patient()
 )
+
+## get information for censoring
+
+# date of death
+dataset.death_date = (case(
+    when(ons_deaths.date.is_not_null()).then(ons_deaths.date),
+    when(ons_deaths.date.is_null() & patients.date_of_death.is_not_null()).then(patients.date_of_death),
+    otherwise = None)
+)
+
+# date of derigstration
+dataset.deregistration_date = practice_registrations.for_patient_on(index_date).end_date
