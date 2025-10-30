@@ -32,8 +32,17 @@ actions:
     outputs:
       moderately_sensitive:
         dataset: output/demo_measures_conditions.csv
+  
+  # action which generates plots of measure across conditions of interest, i.e., asthma and COPD
+  visualise_measures_conditions:
+    run: r:latest analysis/measures_vis_conditions.R
+    needs:
+    - generate_measures_conditions
+    outputs:
+      moderately_sensitive:
+        png: output/measures/measures_by_conditions.png
 
-  # action which creates measure across ages groups, i.e., 12-17, 18-64, 65+
+  # action which creates measure across age groups, i.e., 12-17, 18-64, 65+
   generate_measures_ages:
     run: >
         ehrql:v1 generate-measures
@@ -42,3 +51,12 @@ actions:
     outputs:
       moderately_sensitive:
         dataset: output/demo_measures_ages.csv
+
+  # action which generates plots of measure across age groups, i.e., 12-17, 18-64, 65+
+  visualise_measures_ages:
+    run: r:latest analysis/measures_vis_ages.R
+    needs:
+    - generate_measures_ages
+    outputs:
+      moderately_sensitive:
+        png: output/measures/measures_by_age_groups.png
