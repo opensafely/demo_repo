@@ -3,7 +3,7 @@ from ehrql import create_measures, years, case, when, months
 # import the measures functionality
 from ehrql.measures import INTERVAL
 # import the necessary tables from TPP
-from ehrql.tables.tpp import patients, medications, ons_deaths
+from ehrql.tables.tpp import patients, medications, ons_deaths, practice_registrations
 # import variables which are defined in a separate file
 from variable_lib import (
     has_a_continuous_practice_registration_spanning,
@@ -78,18 +78,15 @@ age_group = (case(
 # define the measure of interest: those with salbutamol inhalers prescribed, by age group
 measures.define_measure(
     "had_prescription_by_age",
-    numerator = (
-        had_prescription
-        & age_of_interest
-        & sex_known
-        & was_alive
-        & had_prescription
-    ),
+    numerator = had_prescription,
     denominator = (
         registered_patients
         & age_of_interest
         & sex_known
         & was_alive
+        # additional check for registration at start of every interval to remove those 
+        # who deregistered DURING a previous interval
+        & practice_registrations.exists_for_patient_on(INTERVAL.start_date)
     ),
     group_by = {"age_group": age_group},
     intervals = intervals,
@@ -109,18 +106,15 @@ had_multiple = (case(
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by age group
 measures.define_measure(
     "had_multiple_inhalers_by_age",
-    numerator = (
-        had_multiple
-        & age_of_interest
-        & sex_known
-        & was_alive
-        & had_prescription
-    ),
+    numerator = had_multiple,
     denominator = (
         registered_patients
         & age_of_interest
         & sex_known
         & was_alive
+        # additional check for registration at start of every interval to remove those 
+        # who deregistered DURING a previous interval
+        & practice_registrations.exists_for_patient_on(INTERVAL.start_date)
     ),
     group_by = {"age_group": age_group},
     intervals = intervals,
@@ -182,18 +176,15 @@ has_asthma_copd = (case(
 # define the measure of interest: those with asthma or copd, by age group
 measures.define_measure(
     "has_asthma_copd_by_age",
-    numerator = (
-        has_asthma_copd
-        & age_of_interest
-        & sex_known
-        & was_alive
-        & had_prescription
-    ),
+    numerator = has_asthma_copd,
     denominator = (
         registered_patients
         & age_of_interest
         & sex_known
         & was_alive
+        # additional check for registration at start of every interval to remove those 
+        # who deregistered DURING a previous interval
+        & practice_registrations.exists_for_patient_on(INTERVAL.start_date)
     ),
     group_by = {"age_group": age_group},
     intervals = intervals,
