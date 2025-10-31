@@ -42,7 +42,7 @@ was_alive = (
 )
 
 # define the interevals to be used for the measures
-intervals = years(2).starting_on(index_date)
+intervals = months(24).starting_on(index_date)
 
 # create ehrQL generated dummy measures
 measures = create_measures()

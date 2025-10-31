@@ -23,7 +23,7 @@ actions:
       highly_sensitive:
         dataset: output/dataset_processed.arrow
 
-  # action which creates measure across conditions of interest, i.e., asthma and COPD
+  # action which creates yearly measure across conditions of interest, i.e., asthma and COPD
   generate_measures_conditions:
     run: >
         ehrql:v1 generate-measures
@@ -32,17 +32,29 @@ actions:
     outputs:
       moderately_sensitive:
         dataset: output/demo_measures_conditions.csv
+
+  # action which creates monthly measure across conditions of interest, i.e., asthma and COPD
+  generate_measures_conditions_monthly:
+    run: >
+        ehrql:v1 generate-measures
+        analysis/demo_measures_definition_conditions_monthly.py
+        --output output/demo_measures_conditions_monthly.csv
+    outputs:
+      moderately_sensitive:
+        dataset: output/demo_measures_conditions_monthly.csv
   
   # action which generates plots of measure across conditions of interest, i.e., asthma and COPD
   visualise_measures_conditions:
     run: r:latest analysis/measures_vis_conditions.R
     needs:
     - generate_measures_conditions
+    - generate_measures_conditions_monthly
     outputs:
       moderately_sensitive:
-        png: output/measures/measures_by_conditions.png
+        png_y: output/measures/measures_by_conditions.png
+        png_m: output/measures/measures_by_conditions_monthly.png
 
-  # action which creates measure across age groups, i.e., 12-17, 18-64, 65+
+  # action which creates yearly measure across age groups, i.e., 12-17, 18-64, 65+
   generate_measures_ages:
     run: >
         ehrql:v1 generate-measures
@@ -52,11 +64,23 @@ actions:
       moderately_sensitive:
         dataset: output/demo_measures_ages.csv
 
+  # action which creates monthly measure across age groups, i.e., 12-17, 18-64, 65+
+  generate_measures_ages_monthly:
+    run: >
+        ehrql:v1 generate-measures
+        analysis/demo_measures_definition_ages_monthly.py
+        --output output/demo_measures_ages_monthly.csv
+    outputs:
+      moderately_sensitive:
+        dataset: output/demo_measures_ages_monthly.csv
+
   # action which generates plots of measure across age groups, i.e., 12-17, 18-64, 65+
   visualise_measures_ages:
     run: r:latest analysis/measures_vis_ages.R
     needs:
     - generate_measures_ages
+    - generate_measures_ages_monthly
     outputs:
       moderately_sensitive:
-        png: output/measures/measures_by_age_groups.png
+        png_y: output/measures/measures_by_age_groups.png
+        png_m: output/measures/measures_by_age_groups_monthly.png

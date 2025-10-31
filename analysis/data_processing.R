@@ -25,9 +25,14 @@ df <- df %>%
                                           "Other Ethnic Groups"),
                                ordered = FALSE), ref = "White"),
     # turn sex into a factor for models
-    sex = relevel(
-      factor(str_to_title(sex), levels = c("Female", "Male", "Intersex")),
-      ref = "Female"),
+    sex = relevel(factor(
+      str_to_title(sex),
+      levels = c("Female", "Male", "Intersex")
+    ), ref = "Female"),
+    # create censor date
+    censor_date = pmin(
+      death_date, deregistration_date, study_end_date, na.rm = TRUE
+    ),
     # create censoring variable
     censor = if_else(
       censor_date < study_end_date, 1, 0
