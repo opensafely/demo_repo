@@ -5,12 +5,12 @@ from ehrql.measures import INTERVAL
 # import the necessary tables from TPP
 from ehrql.tables.tpp import patients, medications, ons_deaths, practice_registrations
 # import variables which are defined in a separate file
-from variable_lib import ( 
+from variable_lib import (
     has_a_continuous_practice_registration_spanning,
     has_prior_event,
     has_prior_meds,
     last_prior_event
- )
+)
 # import the codelists defined in a separate file
 import codelists
 
@@ -42,7 +42,8 @@ was_alive = (
 )
 
 # define the interevals to be used for the measures
-intervals = years(2).starting_on(index_date)
+intervals_years = years(2).starting_on(index_date)
+intervals_months = months(24).starting_on(index_date)
 
 # create ehrQL generated dummy measures
 measures = create_measures()
@@ -60,6 +61,31 @@ relevant_prescriptions_in_interval = (
 
 # define the patients who fit this measure
 had_prescription = relevant_prescriptions_in_interval.exists_for_patient()
+
+# define medication date to find recent prescriptions
+medication_date = index_date - years(1)
+
+# get the age of particpants
+age = patients.age_on(index_date)
+
+# classify ages
+age_group = (case(
+    when((age >= 12) & (age < 18)).then("adolescent"),
+    when((age >= 18) & (age < 65)).then("adult"),
+    when((age >= 65) & (age <= 100)).then("older_adult"),
+    otherwise = "unknown"
+))
+
+# define the quantity of prescriptions of salbutamol in interval
+salbutamol_quantity = (
+    relevant_prescriptions_in_interval.count_for_patient()
+)
+
+# define the patients who received multiple prescriptions in the interval
+had_multiple = (case(
+    when(salbutamol_quantity > 1).then(True),
+    otherwise = False
+))
 
 # define medication date to find recent prescriptions
 medication_date = index_date - years(1)
@@ -109,53 +135,111 @@ copd = (case(
 )
 
 # define whether the patient has asthma, copd, or none of the conditions of interest
+has_asthma_copd = (case(
+    when(asthma).then(True),
+    when(copd).then(True),
+    otherwise = False
+))
+
+# define whether the patient has asthma, copd, or none of the conditions of interest
 condition = (case(
     when(asthma).then("asthma"),
     when(copd).then("copd"),
     otherwise = "none"
 ))
 
-# define the measure of interest: those with salbutamol inhalers prescribed, by condition
-measures.define_measure(
-    "had_prescription_by_condition",
-    numerator = had_prescription,
-    denominator = (
-        registered_patients
+# define default denominator
+measures.define_defaults(
+    denominator = (registered_patients
         & age_of_interest
         & sex_known
         & was_alive
         # additional check for registration at start of every interval to remove those 
         # who deregistered DURING a previous interval
         & practice_registrations.exists_for_patient_on(INTERVAL.start_date)
-    ),
+    )
+)
+
+## yearly measures
+
+# define the measure of interest: those with salbutamol inhalers prescribed, by age group
+measures.define_measure(
+    "had_prescription_by_age_yearly",
+    numerator = had_prescription,
+    group_by = {"age_group": age_group},
+    intervals = intervals_years,
+)
+
+# define the measure of interest: those with multiple salbutamol inhalers prescribed, by age group
+measures.define_measure(
+    "had_multiple_inhalers_by_age_yearly",
+    numerator = had_multiple,
+    group_by = {"age_group": age_group},
+    intervals = intervals_years,
+)
+
+# define the measure of interest: those with asthma or copd, by age group
+measures.define_measure(
+    "has_asthma_copd_by_age_yearly",
+    numerator = has_asthma_copd,
+    group_by = {"age_group": age_group},
+    intervals = intervals_years,
+)
+
+# define the measure of interest: those with salbutamol inhalers prescribed, by condition
+measures.define_measure(
+    "had_prescription_by_condition_yearly",
+    numerator = had_prescription,
     group_by = {"condition": condition},
-    intervals = intervals,
+    intervals = intervals_years,
 )
-
-# define the quantity of prescriptions of salbutamol in interval
-salbutamol_quantity = (
-    relevant_prescriptions_in_interval.count_for_patient()
-)
-
-# define the patients who received multiple prescriptions in the interval
-had_multiple = (case(
-    when(salbutamol_quantity > 1).then(True),
-    otherwise = False
-))
 
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by condition
 measures.define_measure(
-    "had_multiple_inhalers_by_condition",
+    "had_multiple_inhalers_by_condition_yearly",
     numerator = had_multiple,
-    denominator = (
-        registered_patients
-        & age_of_interest
-        & sex_known
-        & was_alive
-        # additional check for registration at start of every interval to remove those 
-        # who deregistered DURING a previous interval
-        & practice_registrations.exists_for_patient_on(INTERVAL.start_date)
-    ),
     group_by = {"condition": condition},
-    intervals = intervals,
+    intervals = intervals_years,
+)
+
+## monthly measures
+
+# define the measure of interest: those with salbutamol inhalers prescribed, by age group
+measures.define_measure(
+    "had_prescription_by_age_monthly",
+    numerator = had_prescription,
+    group_by = {"age_group": age_group},
+    intervals = intervals_months,
+)
+
+# define the measure of interest: those with multiple salbutamol inhalers prescribed, by age group
+measures.define_measure(
+    "had_multiple_inhalers_by_age_monthly",
+    numerator = had_multiple,
+    group_by = {"age_group": age_group},
+    intervals = intervals_months,
+)
+
+# define the measure of interest: those with asthma or copd, by age group
+measures.define_measure(
+    "has_asthma_copd_by_age_monthly",
+    numerator = has_asthma_copd,
+    group_by = {"age_group": age_group},
+    intervals = intervals_months,
+)
+
+# define the measure of interest: those with salbutamol inhalers prescribed, by condition
+measures.define_measure(
+    "had_prescription_by_condition_monthly",
+    numerator = had_prescription,
+    group_by = {"condition": condition},
+    intervals = intervals_months,
+)
+
+# define the measure of interest: those with multiple salbutamol inhalers prescribed, by condition
+measures.define_measure(
+    "had_multiple_inhalers_by_condition_monthly",
+    numerator = had_multiple,
+    group_by = {"condition": condition},
+    intervals = intervals_months,
 )
