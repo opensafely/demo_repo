@@ -3,7 +3,7 @@ from ehrql import create_measures, years, case, when, months
 # import the measures functionality
 from ehrql.measures import INTERVAL
 # import the necessary tables from TPP
-from ehrql.tables.tpp import patients, medications, ons_deaths
+from ehrql.tables.tpp import patients, medications, ons_deaths, practice_registrations
 # import variables which are defined in a separate file
 from variable_lib import ( 
     has_a_continuous_practice_registration_spanning,
@@ -118,18 +118,15 @@ condition = (case(
 # define the measure of interest: those with salbutamol inhalers prescribed, by condition
 measures.define_measure(
     "had_prescription_by_condition",
-    numerator = (
-        registered_patients
-        & age_of_interest
-        & sex_known
-        & was_alive
-        & had_prescription
-    ),
+    numerator = had_prescription,
     denominator = (
         registered_patients
         & age_of_interest
         & sex_known
         & was_alive
+        # additional check for registration at start of every interval to remove those 
+        # who deregistered DURING a previous interval
+        & practice_registrations.exists_for_patient_on(INTERVAL.start_date)
     ),
     group_by = {"condition": condition},
     intervals = intervals,
@@ -149,18 +146,15 @@ had_multiple = (case(
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by condition
 measures.define_measure(
     "had_multiple_inhalers_by_condition",
-    numerator = (
-        had_multiple       
-        & age_of_interest
-        & sex_known
-        & was_alive
-        & had_prescription
-    ),
+    numerator = had_multiple,
     denominator = (
         registered_patients
         & age_of_interest
         & sex_known
         & was_alive
+        # additional check for registration at start of every interval to remove those 
+        # who deregistered DURING a previous interval
+        & practice_registrations.exists_for_patient_on(INTERVAL.start_date)
     ),
     group_by = {"condition": condition},
     intervals = intervals,
