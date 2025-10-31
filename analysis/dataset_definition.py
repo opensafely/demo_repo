@@ -1,5 +1,5 @@
 # import the necessary ehrQL functionalities
-from ehrql import create_dataset, months, years, case, when
+from ehrql import create_dataset, months, years, case, when, minimum_of
 # import the necessary tables from TPP
 from ehrql.tables.tpp import (
     patients, medications,
@@ -143,34 +143,52 @@ dataset.copd = (case(
 # define the interval for inhalers for each year of study
 med_starts, med_ends = med_years(index_date, end_date, 2)   
 
-# number of inhaler prescriptions in year 1 of study
-dataset.salbutamol_quantity_y1 = (
-    medications.where(medications.dmd_code.is_in(codelists.salbutamol))
-    .where(medications.date.is_on_or_between(med_starts[1], med_ends[1]))
-    .count_for_patient()
-)
-
-# number of inhaler prescriptions in year 2 of study
-dataset.salbutamol_quantity_y2 = (
-    medications.where(medications.dmd_code.is_in(codelists.salbutamol))
-    .where(medications.date.is_on_or_between(med_starts[2], med_ends[2]))
-    .count_for_patient()
-)
-
 ## get information for censoring
 
 # date of death
 dataset.death_date = (case(
-    when(ons_deaths.date.is_not_null()).then(ons_deaths.date),
-    when(ons_deaths.date.is_null() & patients.date_of_death.is_not_null()).then(patients.date_of_death),
+    when(ons_deaths.date.is_not_null())
+    .then(ons_deaths.date),
+    when((ons_deaths.date.is_null()) & (patients.date_of_death.is_not_null()))
+    .then(patients.date_of_death),
     otherwise = None)
 )
 
 # date of derigstration
 dataset.deregistration_date = practice_registrations.for_patient_on(index_date).end_date
 
+# define censoring date - earliest of death, deregistration or end of study period
+dataset.censor_date = minimum_of(dataset.death_date, dataset.deregistration_date, end_date)
+
+# number of inhaler prescriptions in year 1 of study
+dataset.salbutamol_quantity_y1 = (
+    medications.where(medications.dmd_code.is_in(codelists.salbutamol))
+    .where(medications.date.is_on_or_between(
+        # only find medications up until censoring - if it occurs
+        med_starts[1], minimum_of(med_ends[1], dataset.censor_date)
+    )
+    ).count_for_patient()
+)
+
+# number of inhaler prescriptions in year 2 of study
+dataset.salbutamol_quantity_y2 = (case(
+    # if censored in year 1, then inhaler quanitity should be null
+    when(minimum_of(med_ends[1], dataset.censor_date) != med_ends[1])
+    .then(None),
+    otherwise = (
+        medications.where(medications.dmd_code.is_in(codelists.salbutamol))
+        .where(medications.date.is_on_or_between(
+            # again, only find medications up until censoring - if it occurs
+            med_starts[2], minimum_of(med_ends[2], dataset.censor_date)
+        )
+        ).count_for_patient()
+    )
+))
+
 # define the size of a dummy population
 dataset.configure_dummy_data(
     population_size = 100, timeout = 1000, 
-    additional_population_constraint = (index_date < dataset.death_date) & (inhaler_prescribed)
+    additional_population_constraint = (
+        (index_date < dataset.death_date) & (inhaler_prescribed)
+    )
 ) 
