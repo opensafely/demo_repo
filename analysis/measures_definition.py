@@ -71,8 +71,8 @@ age = patients.age_on(index_date)
 # classify ages
 age_group = (case(
     when((age >= 12) & (age < 18)).then("adolescent"),
-    when((age >= 18) & (age < 65)).then("adult"),
-    when((age >= 65) & (age <= 100)).then("older_adult"),
+    when((age >= 18) & (age < 59)).then("adult"),
+    when((age >= 60) & (age <= 100)).then("older_adult"),
     otherwise = "unknown"
 ))
 
