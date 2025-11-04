@@ -52,13 +52,9 @@ inhaler_prescribed = (
     .exists_for_patient()
 )
 
-# define population alive at index date
-was_alive = (
-    (ons_deaths.date.is_after(index_date))| # first using ONS deaths (best source)
-    (ons_deaths.date.is_null())|
-    (patients.date_of_death.is_after(index_date))| # then using patient table
-    (patients.date_of_death.is_null())
-)
+# define patients status: alive/dead: use ONS record if present, otherwise use GP record
+death_date = ons_deaths.date.when_null_then(patients.date_of_death)
+was_alive = death_date.is_after(index_date) | death_date.is_null()
 
 # define the population of interest for study
 dataset.define_population(
