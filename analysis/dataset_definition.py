@@ -69,7 +69,7 @@ dataset.define_population(
 dataset.configure_dummy_data(
     # requiring 250 patients matching the above define_population constraints
     population_size = 250
-) 
+)
 
 ## define patient characteristics to extract
 
