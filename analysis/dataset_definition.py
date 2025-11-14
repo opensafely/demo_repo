@@ -65,6 +65,12 @@ dataset.define_population(
     & was_alive
 )
 
+# configure the dummy data
+dataset.configure_dummy_data(
+    # requiring 250 patients matching the above define_population constraints
+    population_size = 250
+) 
+
 ## define patient characteristics to extract
 
 # age at start of follow up
@@ -180,11 +186,3 @@ dataset.salbutamol_quantity_y2 = (case(
         ).count_for_patient()
     )
 ))
-
-# define the size of a dummy population
-dataset.configure_dummy_data(
-    population_size = 100, timeout = 1000, 
-    additional_population_constraint = (
-        (index_date < dataset.death_date) & (inhaler_prescribed)
-    )
-) 
