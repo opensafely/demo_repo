@@ -2,13 +2,14 @@ version: '4.0'
 
 actions:
 
-  # action which creates dataset using ehrQL, will use ehrQL generated dummy data
+  # action which creates dataset using ehrQL, will use user provided dummy tables from 'dummy_tables' folder
   # will also test the dataset definition automatically
   generate_dataset:
     run: >
         ehrql:v1 generate-dataset
         analysis/dataset_definition.py
         --test-data-file analysis/test_dataset_definition.py
+        --dummy-tables dummy_tables
         --output output/dataset.arrow
     outputs:
       highly_sensitive:
