@@ -13,7 +13,7 @@ study_end_date <- ymd("2022-02-28")
 
 #--- measures by age groups
 
-# import measure - when using dummy data some modifications may be needed
+# import measure
 df_year_ages <- bind_rows(
   read_csv(here::here("output", "measures", "had_prescription_by_age_yearly.csv")) %>% 
     mutate(measure = "Had Any Inhalers"),
@@ -22,13 +22,6 @@ df_year_ages <- bind_rows(
   read_csv(here::here("output", "measures", "has_asthma_copd_by_age_yearly.csv")) %>% 
     mutate(measure = "Diagnosis of Asthma or COPD")
 )
-
-# change the data when it's dummy - so there are things to visualise
-df_year_ages <- df_year_ages %>%
-  mutate(
-    numerator = ceiling(denominator/runif(18, 1.24, 3.09)),
-    ratio = numerator/denominator
-  )
 
 # plot the measures
 plot_year_ages <- df_year_ages %>%
@@ -50,20 +43,13 @@ ggsave(here::here("output", "measures", "measures_by_age_groups_yearly.png"),
 
 #--- measures by condition
 
-# import measure - when using dummy data some modifications may be needed
+# import measure
 df_year_conditions <- bind_rows(
   read_csv(here::here("output", "measures", "had_prescription_by_condition_yearly.csv")) %>% 
     mutate(measure = "Had Any Inhalers"),
   read_csv(here::here("output", "measures", "had_multiple_inhalers_by_condition_yearly.csv")) %>% 
     mutate(measure = "Had Multiple Inhalers")
 )
-
-# change the data when it's dummy - so there are things to visualise
-df_year_conditions <- df_year_conditions %>%
-  mutate(
-    numerator = ceiling(denominator/runif(12, 1.24, 3.09)),
-    ratio = numerator/denominator
-  )
 
 # plot the measures
 plot_year_conditions <- df_year_conditions %>%
@@ -87,7 +73,7 @@ ggsave(here::here("output", "measures", "measures_by_conditions_yearly.png"),
 
 #--- measures by age groups
 
-# import measure - when using dummy data some modifications may be needed
+# import measure
 df_month_ages <- bind_rows(
   read_csv(here::here("output", "measures", "had_prescription_by_age_monthly.csv")) %>% 
     mutate(measure = "Had Any Inhalers"),
@@ -103,13 +89,6 @@ df_month_ages <- bind_rows(
       interval_start >= study_start_date + years(1) & interval_start < study_end_date
       ~ paste0(year(study_start_date + years(1)), "-03")
     )
-  )
-
-# change the data when it's dummy - so there are things to visualise
-df_month_ages <- df_month_ages %>%
-  mutate(
-    numerator = ceiling(denominator/runif(216, 1.24, 3.09)),
-    ratio = numerator/denominator
   )
 
 # plot the measures
@@ -131,7 +110,7 @@ ggsave(here::here("output", "measures", "measures_by_age_groups_monthly.png"),
 
 #--- measures by condition
 
-# import measure - when using dummy data some modifications may be needed
+# import measure
 df_month_conditions <- bind_rows(
   read_csv(here::here("output", "measures", "had_prescription_by_condition_monthly.csv")) %>% 
     mutate(measure = "Had Any Inhalers"),
@@ -145,13 +124,6 @@ df_month_conditions <- bind_rows(
       interval_start >= study_start_date + years(1) & interval_start < study_end_date
       ~ paste0(year(study_start_date + years(1)), "-03")
     )
-  )
-
-# change the data when it's dummy - so there are things to visualise
-df_month_conditions <- df_month_conditions %>%
-  mutate(
-    numerator = ceiling(denominator/runif(144, 1.24, 3.09)),
-    ratio = numerator/denominator
   )
 
 # plot the measures

@@ -29,6 +29,7 @@ actions:
     run: >
         ehrql:v1 generate-measures
         analysis/measures_definition.py
+        --dummy-tables dummy_tables
         --output output/measures/:csv
     outputs:
       moderately_sensitive:
