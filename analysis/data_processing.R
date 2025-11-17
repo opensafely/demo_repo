@@ -17,18 +17,28 @@ study_end_date <- ymd("2022-02-28")
 df <- df %>% 
   mutate(
     # add labels to ethnicity
-    ethnicity = relevel(factor(latest_ethnicity_group, 
-                               levels = c("1", "2", "3", "4", "5"),
-                               labels = c("White", "Mixed", 
-                                          "Asian or Asian British",
-                                          "Black or Black British",
-                                          "Other Ethnic Groups"),
-                               ordered = FALSE), ref = "White"),
+    ethnicity = relevel(factor(
+      latest_ethnicity_group, levels = c("1", "2", "3", "4", "5"),
+      labels = c("White", "Mixed", "Asian or Asian British",
+                 "Black or Black British", "Other Ethnic Groups"),
+      ordered = FALSE),
+      ref = "White"
+    ),
     # turn sex into a factor for models
     sex = relevel(factor(
       str_to_title(sex),
-      levels = c("Female", "Male", "Intersex")
-    ), ref = "Female"),
+      levels = c("Female", "Male", "Intersex")),
+      ref = "Female"
+    ),
+    # add grouping variable for age
+    age_group = relevel(factor(
+      case_when(age >= 12 & age < 18 ~ "Adolescent",
+                age >= 18 & age < 60 ~ "Adult",
+                age >= 60 & age <= 110 ~ "Older Adult"),
+      levels = c("Adolescent", "Adult", "Older Adult"),
+      ordered = FALSE),
+      ref = "Adult"
+    ),
     # create censor date
     censor_date = pmin(
       death_date, deregistration_date, study_end_date, na.rm = TRUE
@@ -53,9 +63,9 @@ df_long <- df %>%
   )
 
 # reorder the columns in a way that is logical for future work
-col_order <- c("patient_id", "age", "sex", "ethnicity", "asthma", "copd",
-               "year", "salbutamol_quantity", "censor", "censor_date",
-               "deregistration_date", "death_date")
+col_order <- c("patient_id", "age", "age_group", "sex", "ethnicity", "asthma",
+               "copd", "salbutamol_quantity", "year", "deregistration_date",
+               "death_date", "censor", "censor_date")
 df_long <- df_long[, col_order]
 
 # save the processed data
