@@ -33,7 +33,7 @@ actions:
         --output output/measures/:csv
     outputs:
       moderately_sensitive:
-        dataset: output/measures/*.csv
+        dataset: output/measures/measure_*.csv
 
   # action which generates plots of measures across conditions and age groups
   visualise_measures:
@@ -43,3 +43,21 @@ actions:
     outputs:
       moderately_sensitive:
         png: output/measures/measures_by_*.png
+
+  # action which pulls an OS reusable action ('deciles-charts') to create decile charts for measures
+  generate_deciles_charts:
+    run: >
+      python:latest analysis/deciles_charts.py
+        --input-files output/measures/measure_*.csv
+        --output-dir output/measures
+    config:
+      show_outer_percentiles: false
+      tables:
+        output: true
+      charts:
+        output: true
+    needs: [generate_measures]
+    outputs:
+      moderately_sensitive:
+        deciles_tables: output/measures/deciles_*_*.csv
+        deciles_charts: output/measures/deciles_*_*.png

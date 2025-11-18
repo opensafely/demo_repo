@@ -15,11 +15,11 @@ study_end_date <- ymd("2022-02-28")
 
 # import measure
 df_year_ages <- bind_rows(
-  read_csv(here::here("output", "measures", "had_prescription_by_age_yearly.csv")) %>% 
+  read_csv(here::here("output", "measures", "measure_had_prescription_by_age_yearly.csv")) %>% 
     mutate(measure = "Had Any Inhalers"),
-  read_csv(here::here("output", "measures", "had_multiple_inhalers_by_age_yearly.csv")) %>% 
+  read_csv(here::here("output", "measures", "measure_had_multiple_inhalers_by_age_yearly.csv")) %>% 
     mutate(measure = "Had Multiple Inhalers"),
-  read_csv(here::here("output", "measures", "has_asthma_copd_by_age_yearly.csv")) %>% 
+  read_csv(here::here("output", "measures", "measure_has_asthma_copd_by_age_yearly.csv")) %>% 
     mutate(measure = "Diagnosis of Asthma or COPD")
 )
 
@@ -45,9 +45,9 @@ ggsave(here::here("output", "measures", "measures_by_age_groups_yearly.png"),
 
 # import measure
 df_year_conditions <- bind_rows(
-  read_csv(here::here("output", "measures", "had_prescription_by_condition_yearly.csv")) %>% 
+  read_csv(here::here("output", "measures", "measure_had_prescription_by_condition_yearly.csv")) %>% 
     mutate(measure = "Had Any Inhalers"),
-  read_csv(here::here("output", "measures", "had_multiple_inhalers_by_condition_yearly.csv")) %>% 
+  read_csv(here::here("output", "measures", "measure_had_multiple_inhalers_by_condition_yearly.csv")) %>% 
     mutate(measure = "Had Multiple Inhalers")
 )
 
@@ -75,11 +75,11 @@ ggsave(here::here("output", "measures", "measures_by_conditions_yearly.png"),
 
 # import measure
 df_month_ages <- bind_rows(
-  read_csv(here::here("output", "measures", "had_prescription_by_age_monthly.csv")) %>% 
+  read_csv(here::here("output", "measures", "measure_had_prescription_by_age_monthly.csv")) %>% 
     mutate(measure = "Had Any Inhalers"),
-  read_csv(here::here("output", "measures", "had_multiple_inhalers_by_age_monthly.csv")) %>% 
+  read_csv(here::here("output", "measures", "measure_had_multiple_inhalers_by_age_monthly.csv")) %>% 
     mutate(measure = "Had Multiple Inhalers"),
-  read_csv(here::here("output", "measures", "has_asthma_copd_by_age_monthly.csv")) %>% 
+  read_csv(here::here("output", "measures", "measure_has_asthma_copd_by_age_monthly.csv")) %>% 
     mutate(measure = "Diagnosis of Asthma or COPD")
 ) %>% 
   mutate(
@@ -112,9 +112,9 @@ ggsave(here::here("output", "measures", "measures_by_age_groups_monthly.png"),
 
 # import measure
 df_month_conditions <- bind_rows(
-  read_csv(here::here("output", "measures", "had_prescription_by_condition_monthly.csv")) %>% 
+  read_csv(here::here("output", "measures", "measure_had_prescription_by_condition_monthly.csv")) %>% 
     mutate(measure = "Had Any Inhalers"),
-  read_csv(here::here("output", "measures", "had_multiple_inhalers_by_condition_monthly.csv")) %>% 
+  read_csv(here::here("output", "measures", "measure_had_multiple_inhalers_by_condition_monthly.csv")) %>% 
     mutate(measure = "Had Multiple Inhalers")
 ) %>% 
   mutate(

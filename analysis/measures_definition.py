@@ -159,7 +159,7 @@ measures.define_defaults(
 
 # define the measure of interest: those with salbutamol inhalers prescribed, by age group
 measures.define_measure(
-    "had_prescription_by_age_yearly",
+    "measure_had_prescription_by_age_yearly",
     numerator = had_prescription,
     group_by = {"age_group": age_group},
     intervals = intervals_years,
@@ -167,7 +167,7 @@ measures.define_measure(
 
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by age group
 measures.define_measure(
-    "had_multiple_inhalers_by_age_yearly",
+    "measure_had_multiple_inhalers_by_age_yearly",
     numerator = had_multiple,
     group_by = {"age_group": age_group},
     intervals = intervals_years,
@@ -175,7 +175,7 @@ measures.define_measure(
 
 # define the measure of interest: those with asthma or copd, by age group
 measures.define_measure(
-    "has_asthma_copd_by_age_yearly",
+    "measure_has_asthma_copd_by_age_yearly",
     numerator = has_asthma_copd,
     group_by = {"age_group": age_group},
     intervals = intervals_years,
@@ -183,7 +183,7 @@ measures.define_measure(
 
 # define the measure of interest: those with salbutamol inhalers prescribed, by condition
 measures.define_measure(
-    "had_prescription_by_condition_yearly",
+    "measure_had_prescription_by_condition_yearly",
     numerator = had_prescription,
     group_by = {"condition": condition},
     intervals = intervals_years,
@@ -191,7 +191,7 @@ measures.define_measure(
 
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by condition
 measures.define_measure(
-    "had_multiple_inhalers_by_condition_yearly",
+    "measure_had_multiple_inhalers_by_condition_yearly",
     numerator = had_multiple,
     group_by = {"condition": condition},
     intervals = intervals_years,
@@ -201,7 +201,7 @@ measures.define_measure(
 
 # define the measure of interest: those with salbutamol inhalers prescribed, by age group
 measures.define_measure(
-    "had_prescription_by_age_monthly",
+    "measure_had_prescription_by_age_monthly",
     numerator = had_prescription,
     group_by = {"age_group": age_group},
     intervals = intervals_months,
@@ -209,7 +209,7 @@ measures.define_measure(
 
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by age group
 measures.define_measure(
-    "had_multiple_inhalers_by_age_monthly",
+    "measure_had_multiple_inhalers_by_age_monthly",
     numerator = had_multiple,
     group_by = {"age_group": age_group},
     intervals = intervals_months,
@@ -217,7 +217,7 @@ measures.define_measure(
 
 # define the measure of interest: those with asthma or copd, by age group
 measures.define_measure(
-    "has_asthma_copd_by_age_monthly",
+    "measure_has_asthma_copd_by_age_monthly",
     numerator = has_asthma_copd,
     group_by = {"age_group": age_group},
     intervals = intervals_months,
@@ -225,7 +225,7 @@ measures.define_measure(
 
 # define the measure of interest: those with salbutamol inhalers prescribed, by condition
 measures.define_measure(
-    "had_prescription_by_condition_monthly",
+    "measure_had_prescription_by_condition_monthly",
     numerator = had_prescription,
     group_by = {"condition": condition},
     intervals = intervals_months,
@@ -233,7 +233,7 @@ measures.define_measure(
 
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by condition
 measures.define_measure(
-    "had_multiple_inhalers_by_condition_monthly",
+    "measure_had_multiple_inhalers_by_condition_monthly",
     numerator = had_multiple,
     group_by = {"condition": condition},
     intervals = intervals_months,
