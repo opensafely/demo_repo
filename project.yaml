@@ -48,7 +48,7 @@ actions:
   generate_deciles_charts:
     run: >
       python:latest analysis/deciles_charts.py
-        --input-files output/measures/measure_*.csv
+        --input-files output/measures/measure_*_monthly.csv
         --output-dir output/measures
     config:
       show_outer_percentiles: false
