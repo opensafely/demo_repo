@@ -3,6 +3,7 @@ library(tidyverse)
 library(here)
 library(arrow)
 library(lubridate)
+library(ggplot2)
 
 # import dataset
 df <- read_feather(
@@ -28,57 +29,7 @@ df <- read_feather(
     decile = ntile(salbutamol_quantity, 10)/10
   )
 
-##--- create some decile charts ? 
-
-# ---- compute summary (median + each decile) -----------------
-plot_df <- df %>% 
-  group_by(year_start, decile) %>% 
-  summarise(
-    decile_value = quantile(salbutamol_quantity, probs = unique(decile), na.rm = T),
-    .groups = "drop"
-  )
-
-median_df <- df %>% 
-  group_by(year_start) %>% 
-  summarise(
-    median_value = median(salbutamol_quantity, na.rm = T),
-    .groups = "drop"
-  )
-
-# ---- plotting ------------------------------------------------
-ggplot() +
-  # decile dashed lines
-  geom_line(
-    data = plot_df,
-    aes(x = year_start, y = decile_value, group = decile),
-    color = "blue",
-    linetype = "dashed",
-    alpha = 0.7
-  ) +
-  # median line
-  geom_line(
-    data = median_df,
-    aes(x = year_start, y = median_value),
-    color = "blue",
-    linewidth = 0.9
-  ) +
-  scale_x_date(
-    date_breaks = "3 months",
-    date_labels = "%B %Y"
-  ) +
-  theme_minimal(base_size = 14) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "top"
-  ) +
-  labs(
-    x = NULL, y = NULL, 
-    linetype = "",
-    title = "Median and Deciles Over Time"
-  ) +
-  scale_linetype_manual(
-    values = c("median" = "solid", "decile" = "dashed")
-  )
+##--- create some decile charts
 
 # --- Compute decile points ---
 decile_df <- df %>%
@@ -109,12 +60,11 @@ ggplot(plot_df, aes(x = factor(year_start), y = value, group = interaction(type,
     size = 3,
     alpha = 0.9
   ) +
+  geom_line(color = "blue", linetype = 2) +
   scale_shape_manual(values = c(median = 21, decile = 1),
                      labels = c(median = "Median", decile = "Decile"))  +
   scale_fill_manual(values = c(median = "blue", decile = NA),
                     labels = c(median = "Median", decile = "Decile")) +
-  # scale_x_date(date_breaks = "3 months",
-  #              date_labels = "%B %Y") +
   theme_minimal(base_size = 14) +
   theme(legend.position = "top") +
   labs(
