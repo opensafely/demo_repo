@@ -5,8 +5,8 @@ from ehrql.tables.tpp import (
     patients, medications,
     clinical_events,
     ons_deaths,
-    practice_registrations#,
-    #addresses 
+    practice_registrations,
+    addresses 
 )
 # import variables which are defined in a separate file
 from variable_lib import ( 
@@ -88,8 +88,16 @@ dataset.latest_ethnicity_group = (
     .to_category(codelists.ethnicity_codes)
 )
 
-# potentially add
-# dataset.imd_rounded = addresses.for_patient_on(index_date).imd_rounded
+# patient IMD - from the LSOA associated with their address
+imd_rounded = addresses.for_patient_on(index_date).imd_rounded
+dataset.imd_quintile = case(
+        when((imd_rounded >=0) & (imd_rounded < int(32844 * 1 / 5))).then("1 (most deprived)"),
+        when(imd_rounded < int(32844 * 2 / 5)).then("2"),
+        when(imd_rounded < int(32844 * 3 / 5)).then("3"),
+        when(imd_rounded < int(32844 * 4 / 5)).then("4"),
+        when(imd_rounded < int(32844 * 5 / 5)).then("5 (least deprived)"),
+        otherwise="unknown"
+)
 
 ## define patient comorbidities to extract
 
@@ -145,23 +153,6 @@ dataset.copd = (case(
 # define the interval for inhalers for each year of study
 med_starts, med_ends = med_years(index_date, end_date, 2)   
 
-## get information for censoring
-
-# date of death
-dataset.death_date = (case(
-    when(ons_deaths.date.is_not_null())
-    .then(ons_deaths.date),
-    when((ons_deaths.date.is_null()) & (patients.date_of_death.is_not_null()))
-    .then(patients.date_of_death),
-    otherwise = None)
-)
-
-# date of derigstration
-dataset.deregistration_date = practice_registrations.for_patient_on(index_date).end_date
-
-# define censoring date - earliest of death, deregistration or end of study period
-dataset.censor_date = minimum_of(dataset.death_date, dataset.deregistration_date, end_date)
-
 # number of inhaler prescriptions in year 1 of study
 dataset.salbutamol_quantity_y1 = (
     medications.where(medications.dmd_code.is_in(codelists.salbutamol))
@@ -186,3 +177,20 @@ dataset.salbutamol_quantity_y2 = (case(
         ).count_for_patient()
     )
 ))
+
+## get information for censoring
+
+# date of death
+dataset.death_date = (case(
+    when(ons_deaths.date.is_not_null())
+    .then(ons_deaths.date),
+    when((ons_deaths.date.is_null()) & (patients.date_of_death.is_not_null()))
+    .then(patients.date_of_death),
+    otherwise = None)
+)
+
+# date of derigstration
+dataset.deregistration_date = practice_registrations.for_patient_on(index_date).end_date
+
+# define censoring date - earliest of death, deregistration or end of study period
+dataset.censor_date = minimum_of(dataset.death_date, dataset.deregistration_date, end_date)

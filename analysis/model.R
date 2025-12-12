@@ -12,7 +12,7 @@ df <- read_feather(
 
 # model quantity
 model <- lm(
-  salbutamol_quantity ~ age + sex + ethnicity + asthma + copd + year,
+  salbutamol_quantity ~ age + sex + ethnicity + imd_quintile + asthma + copd + year,
   data = df
 )
 
