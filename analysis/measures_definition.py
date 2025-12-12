@@ -145,7 +145,8 @@ condition = (case(
 
 # define default denominator
 measures.define_defaults(
-    denominator = (registered_patients
+    denominator = (
+        registered_patients
         & age_of_interest
         & sex_known
         & was_alive

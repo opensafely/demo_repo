@@ -24,6 +24,14 @@ actions:
       highly_sensitive:
         dataset: output/dataset_processed.arrow
 
+  # action which creates some additional population visualisations
+  create_population_vis:
+    run: r:latest analysis/study_pop_vis.R 
+    needs:
+    - process_dataset
+    outputs:
+      moderately_sensitive:
+
   # action which creates a series of measures across conditions and age groups
   generate_measures:
     run: >
@@ -44,8 +52,8 @@ actions:
       moderately_sensitive:
         png: output/measures/measures_by_*.png
 
-  # action which pulls an OS reusable action ('deciles-charts') to create decile charts for measures
-  generate_deciles_charts:
+  # action which creates decile charts for measures
+  create_deciles_charts:
     run: >
       python:latest analysis/deciles_charts.py
         --input-files output/measures/measure_*_monthly.csv
@@ -56,7 +64,8 @@ actions:
         output: true
       charts:
         output: true
-    needs: [generate_measures]
+    needs: 
+    - generate_measures
     outputs:
       moderately_sensitive:
         deciles_tables: output/measures/deciles_*_*.csv
