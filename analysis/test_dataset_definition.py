@@ -23,6 +23,7 @@ test_data = {
                 "date_of_death": date(2023, 1, 12)
             }
         ],
+        "addresses": [],
         "clinical_events": [
             #Ethnicity
             {
@@ -129,7 +130,7 @@ test_data = {
         "practice_registrations": [
             {
                 "start_date": date(2019, 8, 10),
-                "end_date": date(2021, 1, 1)
+                "end_date": date(2023, 1, 1)
             }
        ],
         "patients": [
@@ -138,6 +139,7 @@ test_data = {
                 "sex": "male"
             }
         ],
+        "addresses": [],
         "clinical_events": [
             # Ethnicity
             {
@@ -187,6 +189,7 @@ test_data = {
                 "sex": "female"
             }
         ],
+        "addresses": [],
         "clinical_events": [],
         "medications": [],
         "ons_deaths": [],

@@ -148,6 +148,25 @@ dataset.copd = (case(
     otherwise = False)
 )
 
+
+## get information for censoring
+
+# date of death
+dataset.death_date = (case(
+    when(ons_deaths.date.is_not_null())
+    .then(ons_deaths.date),
+    when((ons_deaths.date.is_null()) & (patients.date_of_death.is_not_null()))
+    .then(patients.date_of_death),
+    otherwise = None)
+)
+
+# date of deregistration
+dataset.deregistration_date = practice_registrations.for_patient_on(index_date).end_date
+
+# define censoring date - earliest of death, deregistration or end of study period
+dataset.censor_date = minimum_of(dataset.death_date, dataset.deregistration_date, end_date)
+
+
 ## define patient medication information to extract
 
 # define the interval for inhalers for each year of study
@@ -178,19 +197,7 @@ dataset.salbutamol_quantity_y2 = (case(
     )
 ))
 
-## get information for censoring
 
-# date of death
-dataset.death_date = (case(
-    when(ons_deaths.date.is_not_null())
-    .then(ons_deaths.date),
-    when((ons_deaths.date.is_null()) & (patients.date_of_death.is_not_null()))
-    .then(patients.date_of_death),
-    otherwise = None)
-)
 
-# date of derigstration
-dataset.deregistration_date = practice_registrations.for_patient_on(index_date).end_date
 
-# define censoring date - earliest of death, deregistration or end of study period
-dataset.censor_date = minimum_of(dataset.death_date, dataset.deregistration_date, end_date)
+

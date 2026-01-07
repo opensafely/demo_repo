@@ -31,6 +31,7 @@ actions:
     - process_dataset
     outputs:
       moderately_sensitive:
+        png: output/output.png
 
   # action which creates a series of measures across conditions and age groups
   generate_measures:
