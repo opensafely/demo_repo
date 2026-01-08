@@ -24,15 +24,17 @@ asthma_codes = (
 )
 
 # assign every patient in the sample a random relevant code
-events_sample['snomedct_code'] = np.random.choice(
-    asthma_codes['code'].dropna().to_numpy(),
-    size = len(events_sample), 
-    replace = True
-).astype('Int64')
+events_sample['snomedct_code'] = pd.Series(
+    np.random.choice(
+        asthma_codes['code'].dropna().to_numpy(),
+        size=len(events_sample),
+        replace=True
+    ),
+    dtype="Int64"
+)
 
 # add these modified rows back into the dummy table
 events = pd.concat([events, events_sample], ignore_index = True)
-events['snomedct_code'] = events['snomedct_code'].astype('Int64')
 
 # save the changes made 
 events.to_csv('dummy_tables/clinical_events.csv', index = False)

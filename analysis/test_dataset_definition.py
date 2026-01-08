@@ -23,6 +23,11 @@ test_data = {
                 "date_of_death": date(2023, 1, 12)
             }
         ],
+        "addresses":[
+            {
+                "imd_rounded": 13200
+            }
+        ],
         "clinical_events": [
             #Ethnicity
             {
@@ -115,6 +120,7 @@ test_data = {
             "age": 74,
             "sex": "female",
             "latest_ethnicity_group": "1", # White
+            "imd_quintile": "2",
             "asthma": True, # Asthma diagnosis
             "copd": False, # COPD diagnosis not present
             "salbutamol_quantity_y1": 5, # First year of inhalers
@@ -136,6 +142,11 @@ test_data = {
             {
                 "date_of_birth": date(1980, 1, 1),
                 "sex": "male"
+            }
+        ],
+        "addresses":[
+            {
+                "imd_rounded": 32800
             }
         ],
         "clinical_events": [
@@ -163,11 +174,12 @@ test_data = {
         "expected_columns": {
             "age": 40,
             "sex": "male",
+            "imd_quintile": "5 (least deprived)",
             "latest_ethnicity_group": "4", # Black or Black British
             "asthma": False,
             "copd": False,
             "salbutamol_quantity_y1": 1, # First year of inhalers
-            "salbutamol_quantity_y2": 0, # Second year of inhalers
+            "salbutamol_quantity_y2": None, # Second year of inhalers - none due to censoring
             "death_date": None,
             "deregistration_date": date(2021, 1, 1)
         },
@@ -187,6 +199,7 @@ test_data = {
                 "sex": "female"
             }
         ],
+        "addresses":[],
         "clinical_events": [],
         "medications": [],
         "ons_deaths": [],

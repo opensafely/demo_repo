@@ -63,8 +63,8 @@ df_long <- df %>%
   )
 
 # reorder the columns in a way that is logical for future work
-col_order <- c("patient_id", "age", "age_group", "sex", "ethnicity", "asthma",
-               "copd", "salbutamol_quantity", "year", "deregistration_date",
+col_order <- c("patient_id", "age", "age_group", "sex", "ethnicity", "imd_quintile", 
+               "asthma", "copd", "salbutamol_quantity", "year", "deregistration_date",
                "death_date", "censor", "censor_date")
 df_long <- df_long[, col_order]
 
