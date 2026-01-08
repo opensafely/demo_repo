@@ -82,6 +82,58 @@ had_multiple = (case(
     otherwise = False
 ))
 
+# define default denominator
+denominator = (
+    registered_patients
+    & age_of_interest
+    & sex_known
+    & was_alive
+    # additional check for registration at start of every interval to remove those 
+    # who deregistered DURING a previous interval
+    & practice_registrations.exists_for_patient_on(INTERVAL.start_date)
+)
+measures.define_defaults(
+    denominator = denominator
+)
+
+## yearly measures
+
+# define the measure of interest: those with salbutamol inhalers prescribed, by age group
+measures.define_measure(
+    "measure_had_prescription_by_age_yearly",
+    numerator = had_prescription,
+    group_by = {"age_group": age_group},
+    intervals = intervals_years,
+)
+
+# define the measure of interest: those with multiple salbutamol inhalers prescribed, by age group
+measures.define_measure(
+    "measure_had_multiple_inhalers_by_age_yearly",
+    numerator = had_multiple,
+    group_by = {"age_group": age_group},
+    intervals = intervals_years,
+)
+
+## monthly measures
+
+# define the measure of interest: those with salbutamol inhalers prescribed, by age group
+measures.define_measure(
+    "measure_had_prescription_by_age_monthly",
+    numerator = had_prescription,
+    group_by = {"age_group": age_group},
+    intervals = intervals_months,
+)
+
+# define the measure of interest: those with multiple salbutamol inhalers prescribed, by age group
+measures.define_measure(
+    "measure_had_multiple_inhalers_by_age_monthly",
+    numerator = had_multiple,
+    group_by = {"age_group": age_group},
+    intervals = intervals_months,
+)
+
+##-- create some measures for the population restricted for models
+
 # define medication date to find recent prescriptions
 medication_date = index_date - years(1)
 
@@ -143,57 +195,57 @@ condition = (case(
     otherwise = "none"
 ))
 
-# define default denominator
-measures.define_defaults(
-    denominator = (
-        registered_patients
-        & age_of_interest
-        & sex_known
-        & was_alive
-        # additional check for registration at start of every interval to remove those 
-        # who deregistered DURING a previous interval
-        & practice_registrations.exists_for_patient_on(INTERVAL.start_date)
-    )
+# define the patients with an inhaler of interest in the two years preceeing follow-up
+inhaler_date = index_date - years(2)
+inhaler_prescribed = (
+    medications.where(medications.dmd_code.is_in(codelists.salbutamol))
+    .where(medications.date.is_on_or_between(inhaler_date, index_date))
+    .exists_for_patient()
 )
 
 ## yearly measures
 
 # define the measure of interest: those with salbutamol inhalers prescribed, by age group
 measures.define_measure(
-    "measure_had_prescription_by_age_yearly",
+    "measure_had_prescription_by_age_restricted_pop_yearly",
     numerator = had_prescription,
+    denominator = denominator & inhaler_prescribed,
     group_by = {"age_group": age_group},
     intervals = intervals_years,
 )
 
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by age group
 measures.define_measure(
-    "measure_had_multiple_inhalers_by_age_yearly",
+    "measure_had_multiple_inhalers_by_age_restricted_pop_yearly",
     numerator = had_multiple,
+    denominator = denominator & inhaler_prescribed,
     group_by = {"age_group": age_group},
     intervals = intervals_years,
 )
 
 # define the measure of interest: those with asthma or copd, by age group
 measures.define_measure(
-    "measure_has_asthma_copd_by_age_yearly",
+    "measure_has_asthma_copd_by_age_restricted_pop_yearly",
     numerator = has_asthma_copd,
+    denominator = denominator & inhaler_prescribed,
     group_by = {"age_group": age_group},
     intervals = intervals_years,
 )
 
 # define the measure of interest: those with salbutamol inhalers prescribed, by condition
 measures.define_measure(
-    "measure_had_prescription_by_condition_yearly",
+    "measure_had_prescription_by_condition_restricted_pop_yearly",
     numerator = had_prescription,
+    denominator = denominator & inhaler_prescribed,
     group_by = {"condition": condition},
     intervals = intervals_years,
 )
 
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by condition
 measures.define_measure(
-    "measure_had_multiple_inhalers_by_condition_yearly",
+    "measure_had_multiple_inhalers_by_condition_restricted_pop_yearly",
     numerator = had_multiple,
+    denominator = denominator & inhaler_prescribed,
     group_by = {"condition": condition},
     intervals = intervals_years,
 )
@@ -202,40 +254,45 @@ measures.define_measure(
 
 # define the measure of interest: those with salbutamol inhalers prescribed, by age group
 measures.define_measure(
-    "measure_had_prescription_by_age_monthly",
+    "measure_had_prescription_by_age_restricted_pop_monthly",
     numerator = had_prescription,
+    denominator = denominator & inhaler_prescribed,
     group_by = {"age_group": age_group},
     intervals = intervals_months,
 )
 
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by age group
 measures.define_measure(
-    "measure_had_multiple_inhalers_by_age_monthly",
+    "measure_had_multiple_inhalers_by_age_restricted_pop_monthly",
     numerator = had_multiple,
+    denominator = denominator & inhaler_prescribed,
     group_by = {"age_group": age_group},
     intervals = intervals_months,
 )
 
 # define the measure of interest: those with asthma or copd, by age group
 measures.define_measure(
-    "measure_has_asthma_copd_by_age_monthly",
+    "measure_has_asthma_copd_by_age_restricted_pop_monthly",
     numerator = has_asthma_copd,
+    denominator = denominator & inhaler_prescribed,
     group_by = {"age_group": age_group},
     intervals = intervals_months,
 )
 
 # define the measure of interest: those with salbutamol inhalers prescribed, by condition
 measures.define_measure(
-    "measure_had_prescription_by_condition_monthly",
+    "measure_had_prescription_by_condition_restricted_pop_monthly",
     numerator = had_prescription,
+    denominator = denominator & inhaler_prescribed,
     group_by = {"condition": condition},
     intervals = intervals_months,
 )
 
 # define the measure of interest: those with multiple salbutamol inhalers prescribed, by condition
 measures.define_measure(
-    "measure_had_multiple_inhalers_by_condition_monthly",
+    "measure_had_multiple_inhalers_by_condition_restricted_pop_monthly",
     numerator = had_multiple,
+    denominator = denominator & inhaler_prescribed,
     group_by = {"condition": condition},
     intervals = intervals_months,
 )
