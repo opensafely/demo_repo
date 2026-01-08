@@ -24,6 +24,11 @@ df <- df %>%
       ordered = FALSE),
       ref = "White"
     ),
+    # turn IMD into a factor
+    imd_quintile = relevel(factor(
+      imd_quintile, ordered = FALSE),
+      ref = "5 (least deprived)"
+    ),
     # turn sex into a factor for models
     sex = relevel(factor(
       str_to_title(sex),
