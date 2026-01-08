@@ -109,7 +109,7 @@ repeat_end   = np.datetime64("2022-02-28")
 eligible = meds[(meds['date'] >= repeat_start) & (meds['date'] <= repeat_end)]
 
 # repeat the eligible rows 10 times
-eligible_repeated = pd.concat([eligible] * 2, ignore_index = True)
+eligible_repeated = pd.concat([eligible] * 10, ignore_index = True)
 
 # combine with original data
 meds_expanded = pd.concat([meds, eligible_repeated], ignore_index = True)
@@ -120,7 +120,7 @@ meds_expanded = pd.concat([meds, eligible_repeated], ignore_index = True)
 patients_with_event = events_sample['patient_id'].unique()
 
 # get the rows in the table for the correct patients
-meds_rows_patients = meds_expanded.loc[meds_expanded['patient_id'].isin(patients_with_event) == True].copy()
+meds_rows_patients = meds.loc[meds['patient_id'].isin(patients_with_event) == True].copy()
 
 # get codelist with relevant medication codes
 oral_med_codes = pd.read_csv('codelists/nhs-drug-refsets-c19astdrug_cod.csv')
