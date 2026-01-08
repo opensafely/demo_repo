@@ -30,10 +30,12 @@ model_tidy <- model %>%
       TRUE ~ label)
   )
 
+# define the order for the 
+
 # create forest plot
 model_tidy %>% 
   ggplot(aes(y = label, x = estimate, xmin = conf.low, xmax = conf.high)) +
   geom_vline(xintercept = 0, linetype = 2) +
-  coord_cartesian(xlim = c(-4, 4)) +
+  #coord_cartesian(xlim = c(-4, 4)) +
   geom_pointrange(position = position_dodge(width = 0.75), size = 0.5) +
   theme_bw()
