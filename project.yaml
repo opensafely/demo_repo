@@ -24,14 +24,6 @@ actions:
       highly_sensitive:
         dataset: output/dataset_processed.arrow
 
-  # action which creates some additional population visualisations
-  create_population_vis:
-    run: r:latest analysis/study_pop_vis.R 
-    needs:
-    - process_dataset
-    outputs:
-      moderately_sensitive:
-
   # action which creates a series of measures across conditions and age groups
   generate_measures:
     run: >
