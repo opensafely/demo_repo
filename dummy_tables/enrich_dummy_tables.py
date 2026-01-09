@@ -1,13 +1,14 @@
 # import necessary python libraries
 import pandas as pd
 import numpy as np
-# suppress scientific notation - this will prevent changes to clinical codes
-pd.options.display.float_format = '{:.0f}'.format
 
 ##--- Clinical Events
 
 # import the data you want to enrich
-events = pd.read_csv('dummy_tables/clinical_events.csv')
+events = pd.read_csv(
+    'dummy_tables/clinical_events.csv',
+    dtype={'snomedct_code': 'string'}
+)
 
 ## first we need to change the *codes*
 
@@ -20,7 +21,7 @@ events_sample = (
 # get the codes you want to use
 asthma_codes = (
     pd.read_csv('codelists/nhsd-primary-care-domain-refsets-ast_cod.csv',
-    dtype = {'code': 'Int64'})   # nullable integer
+    dtype = {'code': 'string'})  
 )
 
 # assign every patient in the sample a random relevant code
@@ -30,11 +31,38 @@ events_sample['snomedct_code'] = pd.Series(
         size=len(events_sample),
         replace=True
     ),
-    dtype="Int64"
+    dtype="string"
 )
 
 # add these modified rows back into the dummy table
 events = pd.concat([events, events_sample], ignore_index = True)
+
+## need to also add codes for ethnicity
+
+# get a sample of patients to give the codes to 
+events_sample_ethnicity = (
+    #get one row per patient
+    events.groupby("patient_id").sample(n = 1)
+)
+
+# get the codes to use
+ethnicity_codes = (
+    pd.read_csv('codelists/opensafely-ethnicity-snomed-0removed.csv',
+    dtype = {'code': 'string'})   
+)
+
+# assign every patient a random relevant code
+events_sample_ethnicity['snomedct_code'] = pd.Series(
+    np.random.choice(
+        ethnicity_codes['code'].dropna().to_numpy(),
+        size=len(events_sample_ethnicity),
+        replace=True
+    ),
+    dtype="string"
+)
+
+# add these modified rows back into the dummy table
+events = pd.concat([events, events_sample_ethnicity], ignore_index = True)
 
 # save the changes made 
 events.to_csv('dummy_tables/clinical_events.csv', index = False)
@@ -81,7 +109,7 @@ repeat_end   = np.datetime64("2022-02-28")
 eligible = meds[(meds['date'] >= repeat_start) & (meds['date'] <= repeat_end)]
 
 # repeat the eligible rows 10 times
-eligible_repeated = pd.concat([eligible] * 2, ignore_index = True)
+eligible_repeated = pd.concat([eligible] * 10, ignore_index = True)
 
 # combine with original data
 meds_expanded = pd.concat([meds, eligible_repeated], ignore_index = True)
@@ -92,7 +120,7 @@ meds_expanded = pd.concat([meds, eligible_repeated], ignore_index = True)
 patients_with_event = events_sample['patient_id'].unique()
 
 # get the rows in the table for the correct patients
-meds_rows_patients = meds_expanded.loc[meds_expanded['patient_id'].isin(patients_with_event) == True].copy()
+meds_rows_patients = meds.loc[meds['patient_id'].isin(patients_with_event) == True].copy()
 
 # get codelist with relevant medication codes
 oral_med_codes = pd.read_csv('codelists/nhs-drug-refsets-c19astdrug_cod.csv')
