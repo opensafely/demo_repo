@@ -8,7 +8,16 @@ library(broom.helpers)
 # import dataset
 df <- read_feather(
   here::here("output", "dataset_processed.arrow")
-) 
+) %>%
+  # remove "unknown' categories for modelling
+  mutate(
+    across(where(is.character), ~na_if(., "unknown")),
+    # turn IMD into a factor
+    imd_quintile = relevel(factor(
+      imd_quintile, levels = c("5 (least deprived)", "4", "3", "2", "1 (most deprived)"),
+      ordered = FALSE), ref = "5 (least deprived)"
+    )
+  )
 
 # model quantity
 model <- lm(
@@ -36,7 +45,7 @@ var_order <- c("Female", "Male", "Intersex", "Age (Years)",
                "White", "Mixed", "Asian Or Asian British",
                "Black Or Black British", "Other Ethnic Groups",
                "5 (Least Deprived)", "4", "3", "2", "1 (Most Deprived)", 
-               "Unknown", "Asthma (False)", "Asthma (True)", "COPD (False)",
+               "Asthma (False)", "Asthma (True)", "COPD (False)",
                "COPD (True)", "Study Year 1", "Study Year 2")
 
 # create forest plot
@@ -77,10 +86,10 @@ plot <- plot +
     data = dat_ribbon_long,
     aes(x = x, ymin = ymin, ymax = ymax, group = yposition, fill = fill),
     inherit.aes = FALSE,
-    alpha = 0.2   # sets transparency for filled areas
+    alpha = 0.2
   ) +
   scale_fill_manual(
     values = c("a" = "transparent", "b" = "grey50"),
-    guide = "none"   # hide legend if not needed
+    guide = "none"
   )
 plot
