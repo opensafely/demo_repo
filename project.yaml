@@ -24,7 +24,7 @@ actions:
       highly_sensitive:
         dataset: output/dataset_processed.arrow
 
-  # action whicl will run a linear regression model, tidy the results and save it as a csv
+  # action which will run a linear regression model, tidy the results and save it as a csv
   analyse_dataset:
     run: r:v2 analysis/model.R
     needs:
