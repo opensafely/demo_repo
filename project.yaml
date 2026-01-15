@@ -57,7 +57,7 @@ actions:
   # action which creates decile charts for measures
   create_deciles_charts:
     run: >
-      python:v2 analysis/deciles_charts.py
+      python:v1 analysis/deciles_charts.py
         --input-files output/measures/measure_*_monthly.csv
         --output-dir output/measures
     config:
