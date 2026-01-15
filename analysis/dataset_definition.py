@@ -1,5 +1,6 @@
+# import python functionalities
 import json
-import pathlib as Path
+from pathlib import Path
 from datetime import datetime
 
 # import the necessary ehrQL functionalities
@@ -40,10 +41,10 @@ study_dates = json.loads(
 )
 
 # define start of follow up period
-index_date = datetime.strptime(study_dates[get_parameter(name = "period")[1], "%Y-%m-%d"]).date()
+index_date = datetime.strptime(study_dates[get_parameter(name="period")[0]], "%Y-%m-%d").date()
 
 # define end of follow up period
-end_date = datetime.strptime(study_dates[get_parameter(name="period")[2]], "%Y-%m-%d").date()
+end_date = datetime.strptime(study_dates[get_parameter(name="period")[1]], "%Y-%m-%d").date()
 
 # define the start date for required registration period
 registration_date = index_date - months(3) 

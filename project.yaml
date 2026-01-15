@@ -8,11 +8,12 @@ actions:
   ## pre-pandemic period
   generate_dataset_pre_pandemic:
     run: >
-        ehrql:v1 generate-dataset --period pre_pandemic_start pre_pandemic_end
+        ehrql:v1 generate-dataset
         analysis/dataset_definition.py
         --test-data-file analysis/test_dataset_definition.py
         --dummy-tables dummy_tables
         --output output/dataset_pre_pandemic.arrow
+        -- --period pre_pandemic_start pre_pandemic_end
     outputs:
       highly_sensitive:
         population: output/dataset_pre_pandemic.arrow
@@ -20,11 +21,12 @@ actions:
   ## pandemic period
   generate_dataset_pandemic:
     run: >
-        ehrql:v1 generate-dataset --period pandemic_start pandemic_end
+        ehrql:v1 generate-dataset
         analysis/dataset_definition.py
         --test-data-file analysis/test_dataset_definition.py
         --dummy-tables dummy_tables
         --output output/dataset_pandemic.arrow
+        -- --period pandemic_start pandemic_end
     outputs:
       highly_sensitive:
         population: output/dataset_pandemic.arrow
@@ -32,11 +34,12 @@ actions:
   ## post-pandemic period
   generate_dataset_post_pandemic:
     run: >
-        ehrql:v1 generate-dataset --period post_pandemic_start post_pandemic_end
+        ehrql:v1 generate-dataset 
         analysis/dataset_definition.py
         --test-data-file analysis/test_dataset_definition.py
         --dummy-tables dummy_tables
         --output output/dataset_post_pandemic.arrow
+        -- --period post_pandemic_start post_pandemic_end
     outputs:
       highly_sensitive:
         population: output/dataset_post_pandemic.arrow
