@@ -17,7 +17,7 @@ actions:
 
   # action which will process the dataset from generate_dataset, so data is formatted as desired
   process_dataset:
-    run: r:latest analysis/data_processing.R
+    run: r:v2 analysis/data_processing.R
     needs:
     - generate_dataset
     outputs:
@@ -47,7 +47,7 @@ actions:
 #  # action which generates plots of measures across conditions and age groups
 #  # this is an action you could use if visualisation was wanted to be in the secure server
 #  visualise_measures:
-#    run: r:latest analysis/measures_visualisation.R
+#    run: r:v2 analysis/measures_visualisation.R
 #    needs:
 #    - generate_measures
 #    outputs:
@@ -57,7 +57,7 @@ actions:
   # action which creates decile charts for measures
   create_deciles_charts:
     run: >
-      python:latest analysis/deciles_charts.py
+      python:v2 analysis/deciles_charts.py
         --input-files output/measures/measure_*_monthly.csv
         --output-dir output/measures
     config:
