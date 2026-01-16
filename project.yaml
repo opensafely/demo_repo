@@ -44,7 +44,7 @@ actions:
       highly_sensitive:
         population: output/dataset_post_pandemic.arrow
 
-  # actions which will process the datases from generate_datasets, so data is formatted as desired
+  # actions which will process the datasets from generate_datasets, so data is formatted as desired
 
   ## pre-pandemic period
   process_dataset_pre_pandemic:
