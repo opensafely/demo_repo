@@ -1,3 +1,11 @@
+# Pipeline 2
+
+This branch of the `demo_repo` serves as an example of how you can use [parameterised actions](https://docs.opensafely.org/ehrql/how-to/parameterise-ehrql/) in OpenSAFELY. Parameterised actions allow you to extend the flexibility of the pipeline shown on the [main branch](https://github.com/opensafely/demo_repo) by using command line arguments which, in this case, define the study period. 
+
+In addition to using this type of action in scripts working with ehrQL (in the [dataset_definition](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/dataset_definition.py) and [measures_definition](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/measures_definition.py)), we can using command line arguments in scripts further down the pipeline. Here we show examples of using these arguments within the [processing](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/data_processing.R) and [analysis](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/model.R) scripts.
+
+See below the backround on this entire repo.
+
 # demo_repo
 
 This project will serve as both additional teaching materials for project pipelines within OS, which vary in complexity (using branches). As well as serving as an investigation into inhaler prescribing behaviours surrounding the pandemic.

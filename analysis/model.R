@@ -5,9 +5,21 @@ library(arrow)
 library(broom)
 library(broom.helpers)
 
+# get arguments from the command line
+args <- commandArgs(trailingOnly = TRUE)
+
+# define the period being studied
+if (length(args) == 0) {
+  # if there are no command line arguments (for local running)
+  period <- "pandemic"
+} else {
+  # if there are command line arguments (for CLI running or jobs server)
+  period <- args[[1]]
+}
+
 # import dataset
 df <- read_feather(
-  here::here("output", "dataset_processed.arrow")
+  here::here("output", paste0("dataset_processed_", period, ".arrow"))
 ) %>%
   # remove "unknown' categories for modelling
   mutate(
@@ -41,4 +53,4 @@ model_tidy <- model %>%
   )
 
 # save the tidied model
-write_csv(model_tidy, here::here("output", "model_results.csv"))
+write_csv(model_tidy, here::here("output", paste0("model_results_", period, ".csv")))

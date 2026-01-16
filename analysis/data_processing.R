@@ -4,14 +4,29 @@ library(here)
 library(arrow)
 library(lubridate)
 
+# get study period dates
+source(here("analysis", "design", "design.R"))
+
+# get arguments from the command line
+args <- commandArgs(trailingOnly = TRUE)
+
+# define the start and end dates for period
+if (length(args) == 0) {
+  # if there are no command line arguments (for local running)
+  study_start_date <- as.Date("2020-03-01")
+  study_end_date <- as.Date("2022-02-28")
+  period <- "pandemic"
+} else {
+  # if there are command line arguments (for CLI running or jobs server)
+  study_start_date <- study_dates[[args[[1]]]]
+  study_end_date <- study_dates[[args[[2]]]]
+  period <- str_remove(args[[1]], "_start$")
+}
+
 # import dataset
 df <- read_feather(
-    here::here("output", "dataset.arrow")
+    here::here("output", paste0("dataset_", period, ".arrow"))
 )
-
-# define study dates
-study_start_date <- ymd("2020-03-01")
-study_end_date <- ymd("2022-02-28")
 
 # reformat some of the data
 df <- df %>% 
@@ -75,5 +90,5 @@ df_long <- df_long[, col_order]
 
 # save the processed data
 write_feather(
-  df_long, here::here("output", "dataset_processed.arrow")
+  df_long, here::here("output", paste0("dataset_processed_", period, ".arrow"))
 )
