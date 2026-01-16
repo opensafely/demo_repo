@@ -44,63 +44,29 @@ actions:
       highly_sensitive:
         population: output/dataset_post_pandemic.arrow
 
-  # actions which will process the datasets from generate_datasets, so data is formatted as desired
+  # action which will process the datasets from generate_datasets, so data is formatted as desired
+  # this is equivalent to running three separate processing actions which take command line arguments
 
-  ## pre-pandemic period
-  process_dataset_pre_pandemic:
-    run: r:v2 analysis/data_processing.R pre_pandemic_start pre_pandemic_end
+  process_dataset:
+    run: r:v2 analysis/data_processing.R
     needs:
     - generate_dataset_pre_pandemic
-    outputs:
-      highly_sensitive:
-        dataset: output/dataset_processed_pre_pandemic.arrow
-
-  ## pandemic period
-  process_dataset_pandemic:
-    run: r:v2 analysis/data_processing.R pandemic_start pandemic_end
-    needs:
     - generate_dataset_pandemic
-    outputs:
-      highly_sensitive:
-        dataset: output/dataset_processed_pandemic.arrow
-
-  ## post-pandemic period
-  process_dataset_post_pandemic:
-    run: r:v2 analysis/data_processing.R post_pandemic_start post_pandemic_end
-    needs:
     - generate_dataset_post_pandemic
     outputs:
       highly_sensitive:
-        dataset: output/dataset_processed_post_pandemic.arrow
+        dataset: output/dataset_processed_*.arrow
 
-  # actions which will run a linear regression model, tidy the results and save it as a csv
+  # action which will run a linear regression model, tidy the results and save it as a csv
+  # this is equivalent to running three separate processing actions which take command line arguments
 
-  ## pre-pandemic period
-  analyse_dataset_pre_pandemic:
-    run: r:v2 analysis/model.R pre_pandemic
+  analyse_dataset:
+    run: r:v2 analysis/model.R
     needs:
-    - process_dataset_pre_pandemic
+    - process_dataset
     outputs:
       moderately_sensitive:
-        model: output/model_results_pre_pandemic.csv
-
-  ## pandemic period
-  analyse_dataset_pandemic:
-    run: r:v2 analysis/model.R pandemic
-    needs:
-    - process_dataset_pandemic
-    outputs:
-      moderately_sensitive:
-        model: output/model_results_pandemic.csv
-
-  ## post-pandemic period
-  analyse_dataset_post_pandemic:
-    run: r:v2 analysis/model.R post_pandemic
-    needs:
-    - process_dataset_post_pandemic
-    outputs:
-      moderately_sensitive:
-        model: output/model_results_post_pandemic.csv
+        model: output/model_results_*.csv
 
   # actions which create a series of measures across conditions and age groups
 
@@ -140,17 +106,7 @@ actions:
       moderately_sensitive:
         dataset: output/measures/measures_post_pandemic/measure_*.csv
 
-#  # action which generates plots of measures across conditions and age groups
-#  # this is an action you could use if visualisation was wanted to be in the secure server
-#  visualise_measures:
-#    run: r:v2 analysis/measures_visualisation.R
-#    needs:
-#    - generate_measures
-#    outputs:
-#      moderately_sensitive:
-#        png: output/measures/measures_by_*.png
-
-  # actions which create decile charts for measures
+  # action which creates decile charts for measures
 
   ## pre-pandemic period
   create_deciles_charts_pre_pandemic:

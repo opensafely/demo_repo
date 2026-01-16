@@ -2,7 +2,7 @@
 
 This branch of the `demo_repo` serves as an example of how you can use [parameterised actions](https://docs.opensafely.org/ehrql/how-to/parameterise-ehrql/) in OpenSAFELY. Parameterised actions allow you to extend the flexibility of the pipeline shown on the [main branch](https://github.com/opensafely/demo_repo) by using command line arguments which, in this case, define the study period. 
 
-In addition to using this type of action in scripts working with ehrQL (in the [dataset_definition](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/dataset_definition.py) and [measures_definition](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/measures_definition.py)), we can using command line arguments in scripts further down the pipeline. Here we show examples of using these arguments within the [processing](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/data_processing.R) and [analysis](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/model.R) scripts.
+In addition to using this type of action in scripts working with ehrQL (in the [dataset_definition](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/dataset_definition.py) and [measures_definition](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/measures_definition.py)), we can use command line arguments in scripts further down the pipeline. Here we show examples of using these arguments when creating [deciles charts](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/deciles_charts.py).
 
 See below the backround on this entire repo.
 
