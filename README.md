@@ -1,3 +1,7 @@
+# Pipeline 1
+
+This branch gives an example of the basic usage of OpenSAFELY, for an entire project pipeline. This branch focuses solely on one study period of interest, and all steps are applied across the pipleine in the same manner.
+
 # demo_repo
 
 This project will serve as both additional teaching materials for project pipelines within OS, which vary in complexity (using branches). As well as serving as an investigation into inhaler prescribing behaviours surrounding the pandemic.
