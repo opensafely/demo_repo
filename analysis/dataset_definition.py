@@ -1,18 +1,5 @@
-# import python functionalities
-import json
-from pathlib import Path
-from datetime import datetime
-
 # import the necessary ehrQL functionalities
-from ehrql import (
-    create_dataset,
-    months,
-    years,
-    case,
-    when,
-    minimum_of,
-    get_parameter
-)
+from ehrql import create_dataset, months, years, case, when, minimum_of
 # import the necessary tables from TPP
 from ehrql.tables.tpp import (
     patients, medications,
@@ -35,16 +22,11 @@ import codelists
 # create ehrQL generated dummy dataset
 dataset = create_dataset() 
 
-# import study dates defined in "./analysis/design/study-dates.R" script and then exported
-study_dates = json.loads(
-  Path("analysis/design/study-dates.json").read_text(),
-)
-
 # define start of follow up period
-index_date = datetime.strptime(study_dates[get_parameter(name="period")[0]], "%Y-%m-%d").date()
+index_date = "2020-03-01" 
 
 # define end of follow up period
-end_date = datetime.strptime(study_dates[get_parameter(name="period")[1]], "%Y-%m-%d").date()
+end_date = "2022-02-28"
 
 # define the start date for required registration period
 registration_date = index_date - months(3) 
