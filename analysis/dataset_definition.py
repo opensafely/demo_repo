@@ -1,5 +1,6 @@
 # import the necessary ehrQL functionalities
-from ehrql import create_dataset, months, years, case, when, minimum_of
+from ehrql import create_dataset, months, years, case, when, minimum_of, weeks
+
 # import the necessary tables from TPP
 from ehrql.tables.tpp import (
     patients, medications,
@@ -17,7 +18,16 @@ from variable_lib import (
     med_years
  )
 # import the codelists defined in a separate file
-import codelists 
+import codelists
+
+# Stub code to let us use the `check()` function before we've actually written it
+try:
+    from ehrql import check
+except ImportError:
+
+    def check(*args, **kwargs):
+        pass
+
 
 # create ehrQL generated dummy dataset
 dataset = create_dataset() 
@@ -141,6 +151,67 @@ copd_res = (case(
     otherwise = False)
 )
 
+check(
+    query=copd_res,
+    given={
+        clinical_events: [
+            # COPD resolved
+            {
+                "date": index_date - years(2),
+                "snomedct_code": codelists.copd_resolved_codelist[0],
+            },
+            # Has COPD code after resolved code
+            {
+                "date": index_date - years(1),
+                "snomedct_code": codelists.copd_codelist[0],
+            },
+        ],
+    },
+    expect=False,
+)
+
+check(
+    query=copd_res,
+    given={
+        clinical_events: [
+            # COPD resolved
+            {
+                "date": index_date - years(2),
+                "snomedct_code": codelists.copd_resolved_codelist[0],
+            },
+            # Has QoF COPD review code after resolved code
+            {
+                "date": index_date - years(1),
+                "snomedct_code": codelists.copd_qof_codelist[0],
+            },
+        ],
+    },
+    expect=False,
+)
+
+check(
+    query=copd_res,
+    given={
+        clinical_events: [
+            {
+                "date": index_date - years(3),
+                "snomedct_code": codelists.copd_codelist[0],
+            },
+            {
+                "date": index_date - years(2),
+                "snomedct_code": codelists.copd_qof_codelist[0],
+            },
+            # Resolved code comes after previous COPD codes
+            {
+                "date": index_date - years(1),
+                "snomedct_code": codelists.copd_resolved_codelist[0],
+            },
+        ],
+    },
+    expect=True,
+)
+
+
 # identify whether patient has COPD
 dataset.copd = (case(
     when(
@@ -157,6 +228,54 @@ dataset.copd = (case(
     otherwise = False)
 )
 
+check(
+    query=dataset.copd,
+    given={
+        clinical_events: [
+            # No relevant codes
+            {
+                "date": index_date - years(1),
+                "snomedct_code": "1234567890",
+            },
+        ],
+    },
+    expect=False,
+)
+
+check(
+    query=dataset.copd,
+    given={
+        clinical_events: [
+            # Has COPD code
+            {
+                "date": index_date - years(1),
+                "snomedct_code": codelists.copd_codelist[0],
+            },
+        ],
+    },
+    expect=True,
+)
+
+check(
+    query=dataset.copd,
+    given={
+        clinical_events: [
+            # Has COPD code
+            {
+                "date": index_date - years(2),
+                "snomedct_code": codelists.copd_codelist[0],
+            },
+            # But since resolved
+            {
+                "date": index_date - years(1),
+                "snomedct_code": codelists.copd_resolved_codelist[0],
+            },
+        ],
+    },
+    expect=False,
+)
+
+
 ## define patient medication information to extract
 
 # define the interval for inhalers for each year of study
@@ -172,6 +291,26 @@ dataset.salbutamol_quantity_y1 = (
     ).count_for_patient()
 )
 
+check(
+    query=dataset.salbutamol_quantity_y1,
+    given={
+        medications: [
+            # Before year start
+            {"dmd_code": codelists.salbutamol[0], "date": med_starts[1] - weeks(6)},
+            # Should be counted
+            {"dmd_code": codelists.salbutamol[0], "date": med_starts[1] + weeks(6)},
+            # Wrong drug
+            {"dmd_code": "123456789", "date": med_starts[1] + weeks(6)},
+            # Should be counted
+            {"dmd_code": codelists.salbutamol[0], "date": med_ends[1] - weeks(6)},
+            # After year end
+            {"dmd_code": codelists.salbutamol[0], "date": med_ends[1] + weeks(6)},
+        ],
+    },
+    expect=2,
+)
+
+
 # number of inhaler prescriptions in year 2 of study
 dataset.salbutamol_quantity_y2 = (case(
     # if censored in year 1, then inhaler quanitity should be null
@@ -186,3 +325,34 @@ dataset.salbutamol_quantity_y2 = (case(
         ).count_for_patient()
     )
 ))
+check(
+    query=dataset.salbutamol_quantity_y2,
+    given={
+        # Censored in year 1
+        patients: [
+            {"date_of_death": med_ends[1] - weeks(6)},
+        ],
+        medications: [
+            # Year 2 medication (implausible given death but it tests the censoring logic!)
+            {"dmd_code": codelists.salbutamol[0], "date": med_starts[2] + weeks(6)},
+        ],
+    },
+    expect=None,
+)
+
+check(
+    query=dataset.salbutamol_quantity_y2,
+    given={
+        # Censored before end of year 2
+        patients: [
+            {"date_of_death": med_ends[2] - weeks(6)},
+        ],
+        medications: [
+            # Should be counted
+            {"dmd_code": codelists.salbutamol[0], "date": med_starts[2] + weeks(6)},
+            # After censoring date
+            {"dmd_code": codelists.salbutamol[0], "date": med_ends[2] - weeks(3)},
+        ],
+    },
+    expect=1,
+)
