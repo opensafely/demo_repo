@@ -113,49 +113,42 @@ dataset.censor_date = minimum_of(dataset.death_date, dataset.deregistration_date
 # define medication date to find recent prescriptions
 medication_date = index_date - years(1)
 
+# create combined asthma medications codelist
+asthma_meds = (
+    codelists.asthma_oral_medications + # oral medications
+    codelists.asthma_inhaled_medications # inhaled medications
+)
+
 # identify whether patient is asthmatic
 dataset.asthma = (
     # has a diagnosis code
     (has_prior_event(codelists.asthma_codelist, index_date))
     # and has been prescribed medications in year prior to index
-    & (
-        (has_prior_meds(codelists.asthma_oral_medications, index_date, # oral medications
-            where = medications.date.is_on_or_between(medication_date, index_date)))
-         |(has_prior_meds(codelists.asthma_inhaled_medications, index_date, # inhaled medications
-            where = medications.date.is_on_or_between(medication_date, index_date)))
-    )
+    & (has_prior_meds(
+        asthma_meds,
+        index_date,
+        where = medications.date.is_on_or_between(medication_date, index_date)
+    ))
 )
+
+# create a combined codelist with the relevant COPD codelists
+combined_copd_codes = (
+    codelists.copd_codelist + # diagnosis codes
+    codelists.copd_qof_codelist # review code
+    )
+
+# get the most recent COPD code
+copd_date = last_prior_event(combined_copd_codes, index_date).date
+
+# get the most recent COPD resolution code
+copd_resolved_date = last_prior_event(codelists.copd_resolved_codelist, index_date).date
 
 # identify whether patient had COPD which has been resolved
-copd_res = (case(
-    # has a resolution code
-    when(last_prior_event(codelists.copd_resolved_codelist, index_date).date
-    # which is dated after the latest diagnosis code
-    .is_on_or_after(last_prior_event(codelists.copd_codelist, index_date).date))
-    .then(True),
-    # has a resolution code
-    when(last_prior_event(codelists.copd_resolved_codelist, index_date).date
-    # which is dated after the latest QoF code
-    .is_on_or_after(last_prior_event(codelists.copd_qof_codelist, index_date).date))
-    .then(True),
-    otherwise = False)
-)
+copd_unresolved = copd_resolved_date.is_null() | copd_resolved_date.is_on_or_before(copd_date)
 
 # identify whether patient has COPD
-dataset.copd = (case(
-    when(
-        (
-            # has a copd diagnosis code
-            (has_prior_event(codelists.copd_codelist, index_date)) 
-            # or has a copd review code
-            |(has_prior_event(codelists.copd_qof_codelist, index_date))
-        )
-        # and does not have COPD which has already been resolved
-        & (~copd_res)
-    )
-    .then(True),
-    otherwise = False)
-)
+# first checking for a COPD code and then checking for the resolution
+dataset.copd = copd_date.is_not_null() & copd_unresolved
 
 ## define patient medication information to extract
 
