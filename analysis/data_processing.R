@@ -73,6 +73,18 @@ col_order <- c("patient_id", "age", "age_group", "sex", "ethnicity", "imd_quinti
                "death_date", "censor", "censor_date")
 df_long <- df_long[, col_order]
 
+# remove rows in year two for patients censored in year 1
+df_long <- df_long %>% 
+  mutate(
+    # convert year to integer
+    year = as.integer(year),
+    # define a variable to identify those censored in year 1
+    censored_in_year1 = censor_date < (study_start_date + years(1))
+  ) %>%
+  # drop year 2 rows when censored in year 1
+  filter(!(year == 2 & censored_in_year1)) %>%     
+  select(-censored_in_year1) 
+
 # save the processed data
 write_feather(
   df_long, here::here("output", "dataset_processed.arrow")
