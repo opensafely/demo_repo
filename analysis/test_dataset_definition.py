@@ -25,8 +25,8 @@ test_data = {
         ],
         "addresses":[
             {
-                "imd_rounded": 13200,
-                "date": date(2017, 2, 13)
+                "imd_rounded": 10000,
+                "start_date": date(2017, 2, 13)
             }
         ],
         "clinical_events": [
@@ -148,7 +148,7 @@ test_data = {
         "addresses":[
             {
                 "imd_rounded": 32800,
-                "date": date(2019, 8, 10)
+                "start_date": date(2019, 8, 10)
             }
         ],
         "clinical_events": [
