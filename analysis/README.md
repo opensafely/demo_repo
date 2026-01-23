@@ -19,6 +19,8 @@ There are additional files which are used for these definitions:
 There are then files which are used downstream from the queries:
 
 - `inclusion_processing.R` which is a script which can be used to aggregate the inclusion/exclusion information for release
+- `redaction.R` which is a script containing a function to be used for statistical disclosure control
 - `data_processing.R` which is a script which reformats the data into how it will be used for analysis
+- `table1.R` which is a script which aggregates information about the study population
 - `model.R` which is a script in which the analysis is performed
 - `deciles_charts.py` which is a script which can be used to create decile charts, and the underlying tables, for measures
