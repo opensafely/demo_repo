@@ -2,6 +2,26 @@ version: '4.0'
 
 actions:
 
+  # action which creates a dataset using ehrQL, this is just for getting numbers of patients being
+  # included/excluded, this is not going to be tested and will use ehrQL generated dummy data
+  generate_population:
+    run: >
+      ehrql:v1 generate-dataset
+      analysis/inclusion_definition.py
+      --output output/population.arrow
+    outputs:
+      highly_sensitive:
+        dataset: output/population.arrow
+
+  # action which will agreggate and summarise the data from generate_population
+  process_population:
+    run: r:v2 analysis/inclusion_processing.R
+    needs:
+    - generate_population
+    outputs:
+      moderately_sensitive:
+        dataset: output/population_processed.csv
+
   # action which creates dataset using ehrQL, will use user provided dummy tables from 'dummy_tables' folder
   # will also test the dataset definition automatically
   generate_dataset:
@@ -23,6 +43,15 @@ actions:
     outputs:
       highly_sensitive:
         dataset: output/dataset_processed.arrow
+
+  # action which will aggregate the study population information to create a classic table 1
+  summarise_dataset:
+    run: r:v2 analysis/table1.R
+    needs:
+    - process_dataset
+    outputs:
+      moderately_sensitive:
+        table: output/table1.csv
 
   # action which will run a linear regression model, tidy the results and save it as a csv
   analyse_dataset:
