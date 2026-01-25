@@ -18,7 +18,7 @@ process_dataset <- function(period) {
   study_end_date <- study_dates[[paste0(period, "_end")]]
 
   # reformat some of the data
-  df <- df %>% 
+  df <- df %>%
     mutate(
       # add labels to ethnicity
       ethnicity = relevel(factor(
