@@ -204,3 +204,23 @@ dataset.salbutamol_quantity_y2 = (case(
         ).count_for_patient()
     )
 ))
+
+if index_date != date(2020, 3, 1) :
+
+    # number of inhaler prescriptions in year 3 of study
+    dataset.salbutamol_quantity_y3 = (case(
+        # if censored in year 1 or 2, then inhaler quanitity should be null 
+        when(minimum_of(med_ends[1], dataset.censor_date) != med_ends[1])
+        .then(None),
+        when(minimum_of(med_ends[2], dataset.censor_date) != med_ends[2])
+        .then(None),
+        otherwise = (
+            medications.where(medications.dmd_code.is_in(codelists.salbutamol))
+            .where(medications.date.is_on_or_between(
+                # again, only find medications up until censoring - if it occurs
+                med_starts[3], minimum_of(med_ends[3], dataset.censor_date)
+            )
+            ).count_for_patient()
+        )
+    ))
+    

@@ -14,6 +14,7 @@ process_dataset <- function(period) {
 
   # get study period dates
   source(here("analysis", "design", "design.R"))
+  study_start_date <- study_dates[[paste0(period, "_start")]]
   study_end_date <- study_dates[[paste0(period, "_end")]]
 
   # reformat some of the data
@@ -88,9 +89,22 @@ process_dataset <- function(period) {
     filter(!(year == 2 & censored_in_year1)) %>%     
     select(-censored_in_year1) 
 
+  # for pre-pandemic and post-pandemic remove rows censored in second year
+  if (study_start_date != as.Date("2020-03-01")) {
+    df_long <- df_long %>%
+      mutate(      
+      # define a variable to identify those censored in year 2
+      censored_in_year2 = censor_date < (study_start_date + years(2))
+    ) %>%
+    # drop year 3 rows when censored in year 2
+    filter(!(year == 3 & censored_in_year2)) %>%     
+    select(-censored_in_year2) 
+  }
+
   # save the processed data
   write_feather(
-    df_long, here::here("output", paste0("dataset_processed_", period, ".arrow"))
+    df_long, here::here("output", paste0(
+      "dataset_processed_", period, ".arrow"))
   )
 
 }
