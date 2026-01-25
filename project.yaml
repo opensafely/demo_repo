@@ -83,7 +83,7 @@ actions:
   ## post-pandemic period
   generate_dataset_post_pandemic:
     run: >
-        ehrql:v1 generate-dataset 
+        ehrql:v1 generate-dataset
         analysis/dataset_definition.py
         --test-data-file analysis/test_dataset_definition_post_pandemic.py
         --dummy-tables dummy_tables/dummy_tables_post_pandemic
