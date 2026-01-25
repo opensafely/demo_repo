@@ -1,5 +1,18 @@
+# import python functionalities
+import json
+from pathlib import Path
+from datetime import datetime, date
+
 # import the necessary ehrQL functionalities
-from ehrql import create_dataset, months, years, case, when, minimum_of
+from ehrql import (
+    create_dataset,
+    months,
+    years,
+    case,
+    when,
+    minimum_of,
+    get_parameter
+)
 # import the necessary tables from TPP
 from ehrql.tables.tpp import (
     patients, medications,
@@ -22,11 +35,16 @@ import codelists
 # create ehrQL generated dummy dataset
 dataset = create_dataset() 
 
+# import study dates defined in "./analysis/design/study-dates.R" script and then exported
+study_dates = json.loads(
+  Path("analysis/design/study-dates.json").read_text(),
+)
+
 # define start of follow up period
-index_date = "2020-03-01" 
+index_date = datetime.strptime(study_dates[get_parameter(name="period")[0]], "%Y-%m-%d").date()
 
 # define end of follow up period
-end_date = "2022-02-28"
+end_date = datetime.strptime(study_dates[get_parameter(name="period")[1]], "%Y-%m-%d").date()
 
 # define the start date for required registration period
 registration_date = index_date - months(3) 
@@ -152,8 +170,15 @@ dataset.copd = copd_date.is_not_null() & copd_unresolved
 
 ## define patient medication information to extract
 
+# define number of years in study
+# define the interevals to be used for the measures
+if index_date == date(2020, 3, 1) :
+    year_number = 2
+else :
+    year_number = 3
+
 # define the interval for inhalers for each year of study
-med_starts, med_ends = med_years(index_date, end_date, 2)   
+med_starts, med_ends = med_years(index_date, end_date, year_number)   
 
 # number of inhaler prescriptions in year 1 of study
 dataset.salbutamol_quantity_y1 = (
