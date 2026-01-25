@@ -1,6 +1,6 @@
 # What?
 
-This folder contains 'dummy tables' which have been generated using the OpenSAFELY command line interface (CLI) through the follow commands: 
+This folder contains 'dummy tables' which have been generated using the OpenSAFELY command line interface (CLI) through the follow commands:
 
 - `opensafely exec ehrql:v1 create-dummy-tables analysis/dataset_definition.py dummy_tables/dummy_tables_pre_pandemic -- --period pre_pandemic_start pre_pandemic_end`
 - `opensafely exec ehrql:v1 create-dummy-tables analysis/dataset_definition.py dummy_tables/dummy_tables_pandemic -- --period pandemic_start pandemic_end`
