@@ -110,9 +110,7 @@ actions:
   check_dataset:
     run: r:v2 analysis/sense_checks/internal_checks.R
     needs:
-    - process_dataset_pre_pandemic
-    - process_dataset_pandemic
-    - process_dataset_post_pandemic
+    - process_dataset
     outputs:
       moderately_sensitive:
         categorical: output/sense_checks/categorical_checks_*.csv
