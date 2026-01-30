@@ -6,9 +6,7 @@ In addition to using this type of action in scripts working with ehrQL (in the [
 
 See below the backround on this entire repo.
 
-In addition to using this type of action in scripts working with ehrQL (in the [dataset_definition](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/dataset_definition.py) and [measures_definition](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/measures_definition.py)), we can use command line arguments in scripts further down the pipeline. Here we show examples of using these arguments when creating [deciles charts](https://github.com/opensafely/demo_repo/blob/pipeline_2/analysis/deciles_charts.py).
-
-See below the backround on this entire repo.
+# The OpenSAFELY Demo Repo
 
 This project serves as a teaching resource for project pipelines within OS, which vary in complexity (demonstrated using branches), as well as serving as an investigation into inhaler prescribing behaviours surrounding the pandemic.
 
