@@ -86,7 +86,7 @@ sense_checking <- function(period) {
       )
     
     # save the plots
-    ggsave(here::here("output", "sense_checks", paste0(var, "_hist.png")))
+    ggsave(here::here("output", "sense_checks", paste0(var, "_hist_", period, ".png")))
     
   }
 
