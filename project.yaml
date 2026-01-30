@@ -120,7 +120,6 @@ actions:
 
   # action which will aggregate the study population information to create a classic table 1
   # this is equivalent to running three separate summarising actions which take command line arguments
-
   summarise_dataset:
     run: r:v2 analysis/table1.R
     needs:
