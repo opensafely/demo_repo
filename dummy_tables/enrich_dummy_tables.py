@@ -150,3 +150,38 @@ meds_expanded = pd.concat([meds_expanded, meds_rows_patients], ignore_index = Tr
 
 # save the changes made 
 meds_expanded.to_csv('dummy_tables/medications.csv', index = False)
+
+##--- Practice Registrations
+
+## add practice deregistrations for some individuals
+
+# first get current registrations table
+registrations = pd.read_csv(
+    'dummy_tables/practice_registrations.csv',
+    dtype={'snomedct_code': 'string'}
+)
+
+# define the date range for the codes of interest
+start_reg = np.datetime64("2020-03-01")
+end_reg   = np.datetime64("2022-02-28")
+
+# get the number of days between start and end
+days = (end_reg - start_reg).astype(int)
+
+# pick a random number of days to add to the start - for each row in the csv
+random_days = np.random.randint(0, days + 1, size = 50)
+
+# choose how many rows to update (max 50, but never more than len)
+n = min(50, len(registrations))
+
+# randomly pick row indices
+random_idx = np.random.choice(registrations.index, size = n, replace = False)
+
+# initialize column with correct dtype
+registrations['end_date'] = pd.Series(pd.NaT, dtype = 'datetime64[ns]')
+
+# assign the end dates at random locations
+registrations.loc[random_idx, 'end_date'] = start_reg + random_days
+
+# save the changes made 
+registrations.to_csv('dummy_tables/practice_registrations.csv', index = False)

@@ -44,6 +44,18 @@ actions:
       highly_sensitive:
         dataset: output/dataset_processed.arrow
 
+  # action which will provide sense checks for the data - not intended for release
+  check_dataset:
+    run: r:v2 analysis/sense_checks/internal_checks.R
+    needs:
+    - process_dataset
+    outputs:
+      moderately_sensitive:
+        categorical: output/sense_checks/categorical_checks.csv
+        continuous: output/sense_checks/*_hist.png
+        dates: output/sense_checks/date_checks.csv
+        missing: output/sense_checks/missing_values.csv
+
   # action which will aggregate the study population information to create a classic table 1
   summarise_dataset:
     run: r:v2 analysis/table1.R
