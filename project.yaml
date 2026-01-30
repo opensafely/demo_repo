@@ -106,9 +106,22 @@ actions:
       highly_sensitive:
         dataset: output/dataset_processed_*.arrow
 
+  # action which will provide sense checks for the data - not intended for release
+  check_dataset:
+    run: r:v2 analysis/sense_checks/internal_checks.R
+    needs:
+    - process_dataset_pre_pandemic
+    - process_dataset_pandemic
+    - process_dataset_post_pandemic
+    outputs:
+      moderately_sensitive:
+        categorical: output/sense_checks/categorical_checks_*.csv
+        continuous: output/sense_checks/*_hist_*.png
+        dates: output/sense_checks/date_checks_*.csv
+        missing: output/sense_checks/missing_values_*.csv
+
   # action which will aggregate the study population information to create a classic table 1
   # this is equivalent to running three separate summarising actions which take command line arguments
-
   summarise_dataset:
     run: r:v2 analysis/table1.R
     needs:
