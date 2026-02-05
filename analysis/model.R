@@ -7,10 +7,15 @@ library(broom.helpers)
 
 # use a function to model the dataset
 model_dataset <- function(period) {
+  
+  # get command line arguments
+  args <- commandArgs(trailingOnly = TRUE)
+  cohort <- args[[1]]
 
   # import dataset
   df <- read_feather(
-    here::here("output", paste0("dataset_processed_", period, ".arrow"))
+    here::here("output", paste0("dataset_processed_", cohort, "_", 
+                                period, ".arrow"))
   ) %>%
     # remove "unknown' categories for modelling
     mutate(
@@ -23,10 +28,19 @@ model_dataset <- function(period) {
     )
 
   # model quantity
-  model <- lm(
-    salbutamol_quantity ~ age + sex + ethnicity + imd_quintile + asthma + copd + year,
-    data = df
-  )
+  if (cohort == "older") {
+    # model with COPD for age group likely to have it 
+    model <- lm(
+      salbutamol_quantity ~ age + sex + ethnicity + imd_quintile + asthma + copd + year,
+      data = df
+    )
+  } else {
+    # remove COPD for models on younger population
+    model <- lm(
+      salbutamol_quantity ~ age + sex + ethnicity + imd_quintile + asthma + year,
+      data = df
+    )
+  }
 
   # tidy the model
   model_tidy <- model %>%
@@ -45,7 +59,7 @@ model_dataset <- function(period) {
 
   # save the tidied model
   write_csv(model_tidy, here::here(
-    "output", paste0("model_results_", period, ".csv")))
+    "output", paste0("model_results_", cohort, "_", period, ".csv")))
 
 }
 

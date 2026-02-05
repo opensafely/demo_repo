@@ -8,11 +8,11 @@ library(ggplot2)
 fs::dir_create(here::here("output", "sense_checks"))
 
 # create a function to do all the sense checking
-sense_checking <- function(period) {
+sense_checking <- function(period, cohort) {
 
   # import processed dataset
   df <- read_feather(
-    here::here("output", paste0("dataset_processed_", period, ".arrow"))
+    here::here("output", paste0("dataset_processed_", cohort, "_", period, ".arrow"))
   ) %>% 
     mutate(
       # turn IMD into an ordered factor
@@ -63,7 +63,7 @@ sense_checking <- function(period) {
 
   # save the final table
   write_csv(long_table, here::here("output", "sense_checks",
-                                   paste0("categorical_checks_", period, ".csv")))
+                                   paste0("categorical_checks_", cohort, "_", period, ".csv")))
 
   ## histograms for continuous variables and dates
 
@@ -86,7 +86,7 @@ sense_checking <- function(period) {
       )
     
     # save the plots
-    ggsave(here::here("output", "sense_checks", paste0(var, "_hist_", period, ".png")))
+    ggsave(here::here("output", "sense_checks", paste0(var, "_hist_", cohort, "_", period, ".png")))
     
   }
 
@@ -122,7 +122,7 @@ sense_checking <- function(period) {
 
   # save the information
   write_csv(df_miss_sum, here::here("output", "sense_checks",
-                                    paste0("missing_values_", period, ".csv")))
+                                    paste0("missing_values_", cohort, "_", period, ".csv")))
 
   ## check date orders
 
@@ -157,15 +157,28 @@ sense_checking <- function(period) {
 
   # save the information
   write_csv(df_dates, here::here("output", "sense_checks",
-                                 paste0("date_checks_", period, ".csv")))
+                                 paste0("date_checks_", cohort, "_", period, ".csv")))
 
 }
 
 ## pre-pandemic period
-sense_checking("pre_pandemic")
+
+# older
+sense_checking("pre_pandemic", "older")
+# younger
+sense_checking("pre_pandemic", "younger")
 
 ## pandemic period
-sense_checking("pandemic")
+
+# older
+sense_checking("pandemic", "older")
+# younger
+sense_checking("pandemic", "younger")
+
 
 ## post-pandemic period
-sense_checking("post_pandemic")
+
+# older
+sense_checking("post_pandemic", "older")
+# younger
+sense_checking("post_pandemic", "younger")

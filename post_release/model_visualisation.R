@@ -2,18 +2,30 @@ library(tidyverse)
 library(ggplot2)
 
 # create function for plotting model results 
-plot_model <- function(period) {
+plot_model <- function(period, cohort) {
 
   # import the model results
-  model_tidy <- read_csv(here::here("output", paste0("model_results_", period, ".csv")))
+  model_tidy <- read_csv(here::here("output", paste0("model_results_", cohort, "_", period, ".csv")))
 
   # define the order for the variables
-  var_order <- c("Female", "Male", "Intersex", "Age (Years)",
-                "White", "Mixed", "Asian Or Asian British",
-                "Black Or Black British", "Other Ethnic Groups",
-                "5 (Least Deprived)", "4", "3", "2", "1 (Most Deprived)", 
-                "Asthma (False)", "Asthma (True)", "COPD (False)",
-                "COPD (True)", "Study Year 1", "Study Year 2")
+  if (cohort == "older") {
+
+    var_order <- c("Female", "Male", "Intersex", "Age (Years)",
+              "White", "Mixed", "Asian Or Asian British",
+              "Black Or Black British", "Other Ethnic Groups",
+              "5 (Least Deprived)", "4", "3", "2", "1 (Most Deprived)", 
+              "Asthma (False)", "Asthma (True)", "COPD (False)",
+              "COPD (True)", "Study Year 1", "Study Year 2")
+
+  } else {
+
+    var_order <- c("Female", "Male", "Intersex", "Age (Years)",
+              "White", "Mixed", "Asian Or Asian British",
+              "Black Or Black British", "Other Ethnic Groups",
+              "5 (Least Deprived)", "4", "3", "2", "1 (Most Deprived)", 
+              "Asthma (False)", "Asthma (True)", "Study Year 1", "Study Year 2")
+
+  }
 
   # create forest plot
   plot <- model_tidy %>% 
@@ -59,17 +71,29 @@ plot_model <- function(period) {
       values = c("a" = "transparent", "b" = "grey50"),
       guide = "none"
     ) +
-    labs(title = period)
+    labs(title = paste0(period, " in ", cohort, "individuals"))
   
   return(plot)
 
 }
 
 ## pre-pandemic period
-plot_model("pre_pandemic")
+
+# older
+plot_model("pre_pandemic", "older")
+# younger
+plot_model("pre_pandemic", "younger")
 
 ## pandemic period
-plot_model("pandemic")
+
+# older
+plot_model("pandemic", "older")
+# younger
+plot_model("pandemic", "younger")
 
 ## post-pandemic period
-plot_model("post_pandemic")
+
+# older
+plot_model("post_pandemic", "older")
+# younger
+plot_model("post_pandemic", "younger")
