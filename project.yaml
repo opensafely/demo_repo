@@ -154,13 +154,13 @@ actions:
         model: output/model_results_older_*.csv
 
   ## younger individuals
-  analyse_dataset_older:
-    run: r:v2 analysis/model.R older
+  analyse_dataset_younger:
+    run: r:v2 analysis/model.R younger
     needs:
-    - process_dataset_older
+    - process_dataset_younger
     outputs:
       moderately_sensitive:
-        model: output/model_results_older_*.csv
+        model: output/model_results_younger_*.csv
 
   # actions which create a series of measures across conditions and age groups
 
