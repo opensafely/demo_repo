@@ -6,11 +6,11 @@ library(gtsummary)
 library(readr)
 
 # use a function to create table 1
-describe_dataset <- function(period) {
+describe_dataset <- function(period, cohort) {
 
   # import dataset
   df <- read_feather(
-    here::here("output", paste0("dataset_processed_", period, ".arrow"))
+    here::here("output", paste0("dataset_processed_", cohort, "_", period, ".arrow"))
   )
 
   # summarise the patient characteristics
@@ -57,15 +57,27 @@ describe_dataset <- function(period) {
     as_tibble()
 
   # save the file
-  write_csv(gt_table, path = here::here("output", paste0("table1_", period, ".csv")))
+  write_csv(gt_table, path = here::here("output", paste0("table1_", cohort, "_", period, ".csv")))
 
 }
 
 ## pre-pandemic period
-describe_dataset("pre_pandemic")
+
+# older
+describe_dataset("pre_pandemic", "older")
+# younger
+describe_dataset("pre_pandemic", "younger")
 
 ## pandemic period
-describe_dataset("pandemic")
+
+# older
+describe_dataset("pandemic", "older")
+# younger
+describe_dataset("pandemic", "younger")
 
 ## post-pandemic period
-describe_dataset("post_pandemic")
+
+# older
+describe_dataset("post_pandemic", "older")
+# younger
+describe_dataset("post_pandemic", "younger")

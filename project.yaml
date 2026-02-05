@@ -92,24 +92,37 @@ actions:
       highly_sensitive:
         population: output/dataset_post_pandemic.arrow
 
-  # action which will process the datasets from generate_datasets, so data is formatted as desired
-  # this is equivalent to running three separate processing actions which take command line arguments
+  # actions which will process the datasets from generate_datasets, so data is formatted as desired
+  # this is equivalent to running six separate processing actions which take command line arguments
 
-  process_dataset:
-    run: r:v2 analysis/data_processing.R
+  process_dataset_older:
+    run: r:v2 analysis/data_processing.R older
     needs:
     - generate_dataset_pre_pandemic
     - generate_dataset_pandemic
     - generate_dataset_post_pandemic
     outputs:
       highly_sensitive:
-        dataset: output/dataset_processed_*.arrow
+        dataset: output/dataset_processed_older_*.arrow
+
+  process_dataset_younger:
+    run: r:v2 analysis/data_processing.R younger
+    needs:
+    - generate_dataset_pre_pandemic
+    - generate_dataset_pandemic
+    - generate_dataset_post_pandemic
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset_processed_younger_*.arrow
+        
 
   # action which will provide sense checks for the data - not intended for release
+  # equivalent to running six separate actions which take command line arguments
   check_dataset:
     run: r:v2 analysis/sense_checks/internal_checks.R
     needs:
-    - process_dataset
+    - process_dataset_older
+    - process_dataset_younger
     outputs:
       moderately_sensitive:
         categorical: output/sense_checks/categorical_checks_*.csv
@@ -118,24 +131,36 @@ actions:
         missing: output/sense_checks/missing_values_*.csv
 
   # action which will aggregate the study population information to create a classic table 1
-  # this is equivalent to running three separate summarising actions which take command line arguments
+  # this is equivalent to running six separate summarising actions which take command line arguments
   summarise_dataset:
     run: r:v2 analysis/table1.R
     needs:
-    - process_dataset
+    - process_dataset_older
+    - process_dataset_younger
     outputs:
       moderately_sensitive:
         table: output/table1_*.csv
 
-  # action which will run a linear regression model, tidy the results and save it as a csv
-  # this is equivalent to running three separate modelling actions which take command line arguments
-  analyse_dataset:
-    run: r:v2 analysis/model.R
+  # actions which will run a linear regression model, tidy the results and save it as a csv
+  # this is equivalent to running six separate modelling actions which take command line arguments
+
+  ## older individuals
+  analyse_dataset_older:
+    run: r:v2 analysis/model.R older
     needs:
-    - process_dataset
+    - process_dataset_older
     outputs:
       moderately_sensitive:
-        model: output/model_results_*.csv
+        model: output/model_results_older_*.csv
+
+  ## younger individuals
+  analyse_dataset_older:
+    run: r:v2 analysis/model.R older
+    needs:
+    - process_dataset_older
+    outputs:
+      moderately_sensitive:
+        model: output/model_results_older_*.csv
 
   # actions which create a series of measures across conditions and age groups
 
@@ -175,17 +200,7 @@ actions:
       moderately_sensitive:
         dataset: output/measures/measures_post_pandemic/measure_*.csv
 
-#  # action which generates plots of measures across conditions and age groups
-#  # this is an action you could use if visualisation was wanted to be in the secure server
-#  visualise_measures:
-#    run: r:v2 analysis/measures_visualisation.R
-#    needs:
-#    - generate_measures
-#    outputs:
-#      moderately_sensitive:
-#        png: output/measures/measures_by_*.png
-
-  # action which creates decile charts for measures
+  # actions which create decile charts for measures
 
   ## pre-pandemic period
   create_deciles_charts_pre_pandemic:

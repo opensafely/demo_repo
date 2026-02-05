@@ -7,6 +7,10 @@ library(lubridate)
 # use a function to process the dataset
 process_dataset <- function(period) {
 
+  # get command line arguments
+  args <- commandArgs(trailingOnly = TRUE)
+  cohort <- args[[1]]
+
   # import dataset
   df <- read_feather(
       here::here("output", paste0("dataset_", period, ".arrow"))
@@ -16,6 +20,17 @@ process_dataset <- function(period) {
   source(here("analysis", "design", "design.R"))
   study_start_date <- study_dates[[paste0(period, "_start")]]
   study_end_date <- study_dates[[paste0(period, "_end")]]
+
+  # filter the dataset to get the cohort of interest
+  if (cohort == "older") {
+    df <- df %>% 
+      # of individuals between 12 and 100, get those 60+
+      filter(age >= 60)
+  } else {
+    # of individuals between 12 and 100, get those 12-59
+    df <- df %>% 
+      filter(age < 60)
+  }
 
   # reformat some of the data
   df <- df %>%
@@ -104,7 +119,7 @@ process_dataset <- function(period) {
   # save the processed data
   write_feather(
     df_long, here::here("output", paste0(
-      "dataset_processed_", period, ".arrow"))
+      "dataset_processed_", cohort, "_", period, ".arrow"))
   )
 
 }
