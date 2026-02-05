@@ -95,6 +95,7 @@ actions:
   # actions which will process the datasets from generate_datasets, so data is formatted as desired
   # this is equivalent to running six separate processing actions which take command line arguments
 
+  ## older individuals
   process_dataset_older:
     run: r:v2 analysis/data_processing.R older
     needs:
@@ -105,6 +106,7 @@ actions:
       highly_sensitive:
         dataset: output/dataset_processed_older_*.arrow
 
+  ## younger individuals
   process_dataset_younger:
     run: r:v2 analysis/data_processing.R younger
     needs:
@@ -115,7 +117,6 @@ actions:
       highly_sensitive:
         dataset: output/dataset_processed_younger_*.arrow
         
-
   # action which will provide sense checks for the data - not intended for release
   # equivalent to running six separate actions which take command line arguments
   check_dataset:
