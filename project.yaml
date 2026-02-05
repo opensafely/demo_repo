@@ -94,7 +94,6 @@ actions:
 
   # action which will process the datasets from generate_datasets, so data is formatted as desired
   # this is equivalent to running three separate processing actions which take command line arguments
-
   process_dataset:
     run: r:v2 analysis/data_processing.R
     needs:
@@ -106,6 +105,7 @@ actions:
         dataset: output/dataset_processed_*.arrow
 
   # action which will provide sense checks for the data - not intended for release
+  # this is equivalent to running three separate checking actions which take command line arguments
   check_dataset:
     run: r:v2 analysis/sense_checks/internal_checks.R
     needs:
@@ -175,17 +175,7 @@ actions:
       moderately_sensitive:
         dataset: output/measures/measures_post_pandemic/measure_*.csv
 
-#  # action which generates plots of measures across conditions and age groups
-#  # this is an action you could use if visualisation was wanted to be in the secure server
-#  visualise_measures:
-#    run: r:v2 analysis/measures_visualisation.R
-#    needs:
-#    - generate_measures
-#    outputs:
-#      moderately_sensitive:
-#        png: output/measures/measures_by_*.png
-
-  # action which creates decile charts for measures
+  # actions which create decile charts for measures
 
   ## pre-pandemic period
   create_deciles_charts_pre_pandemic:
