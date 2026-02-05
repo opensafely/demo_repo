@@ -29,6 +29,14 @@ actions:
 
   ## post-pandemic period
   generate_population_post_pandemic:
+    run: >
+      ehrql:v1 generate-dataset
+      analysis/inclusion_definition.py
+      --output output/population_post_pandemic.arrow
+      -- --period post_pandemic_start post_pandemic_end
+    outputs:
+      highly_sensitive:
+        dataset: output/population_post_pandemic.arrow
   
   ## pre-pandemic period
   generate_population_pre_pandemic:
