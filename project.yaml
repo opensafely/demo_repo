@@ -29,6 +29,31 @@ actions:
 
   ## post-pandemic period
   generate_population_post_pandemic:
+  
+  ## pre-pandemic period
+  generate_population_pre_pandemic:
+    run: >
+      ehrql:v1 generate-dataset
+      analysis/inclusion_definition.py
+      --output output/population_pre_pandemic.arrow
+      -- --period pre_pandemic_start pre_pandemic_end
+    outputs:
+      highly_sensitive:
+        dataset: output/population_pre_pandemic.arrow
+
+  ## pandemic period
+  generate_population_pandemic:
+    run: >
+      ehrql:v1 generate-dataset
+      analysis/inclusion_definition.py
+      --output output/population_pandemic.arrow
+      -- --period pandemic_start pandemic_end
+    outputs:
+      highly_sensitive:
+        dataset: output/population_pandemic.arrow
+
+  ## post-pandemic period
+  generate_population_post_pandemic:
     run: >
       ehrql:v1 generate-dataset
       analysis/inclusion_definition.py
@@ -85,9 +110,23 @@ actions:
     run: >
         ehrql:v1 generate-dataset
         analysis/dataset_definition.py
+        --test-data-file analysis/test_dataset_definition_pandemic_post_pandemic.py
+        --dummy-tables dummy_tables/dummy_tables_pandemic/dummy_tables_post_pandemic
+        --output output/dataset_pandemic_post_pandemic.arrow
+        -- --period pandemic_start pandemic_end
+    outputs:
+      highly_sensitive:
+        population: output/dataset_pandemic.arrow
+
+  ## post-pandemic period
+  generate_dataset_post_pandemic:
+    run: >
+        ehrql:v1 generate-dataset 
+        analysis/dataset_definition.py
         --test-data-file analysis/test_dataset_definition_post_pandemic.py
         --dummy-tables dummy_tables/dummy_tables_post_pandemic
         --output output/dataset_post_pandemic.arrow
+        -- --period post_pandemic_start post_pandemic_end
         -- --period post_pandemic_start post_pandemic_end
     outputs:
       highly_sensitive:
@@ -113,10 +152,10 @@ actions:
     - process_dataset
     outputs:
       moderately_sensitive:
-        categorical: output/sense_checks/categorical_checks.csv
-        continuous: output/sense_checks/*_hist.png
-        dates: output/sense_checks/date_checks.csv
-        missing: output/sense_checks/missing_values.csv
+        categorical: output/sense_checks/categorical_checks_*.csv
+        continuous: output/sense_checks/*_hist_*.png
+        dates: output/sense_checks/date_checks_*.csv
+        missing: output/sense_checks/missing_values_*.csv
 
   # action which will aggregate the study population information to create a classic table 1
   # this is equivalent to running three separate summarising actions which take command line arguments
