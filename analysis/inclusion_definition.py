@@ -1,5 +1,10 @@
+# import python functionalities
+import json
+from pathlib import Path
+from datetime import datetime
+
 # import the necessary ehrQL functionalities
-from ehrql import create_dataset, months, years, case, when, minimum_of
+from ehrql import create_dataset, months, years, case, when, minimum_of, get_parameter
 # import the necessary tables from TPP
 from ehrql.tables.tpp import patients, medications, ons_deaths
 # import variables which are defined in a separate file
@@ -9,11 +14,16 @@ import codelists
 # create ehrQL generated dummy dataset
 dataset = create_dataset() 
 
+# import study dates defined in "./analysis/design/study-dates.R" script and then exported
+study_dates = json.loads(
+  Path("analysis/design/study-dates.json").read_text(),
+)
+
 # define start of follow up period
-index_date = "2020-03-01" 
+index_date = datetime.strptime(study_dates[get_parameter(name="period")[0]], "%Y-%m-%d").date()
 
 # define end of follow up period
-end_date = "2022-02-28"
+end_date = datetime.strptime(study_dates[get_parameter(name="period")[1]], "%Y-%m-%d").date()
 
 # define patients status: alive/dead: use ONS record if present, otherwise use GP record
 death_date = ons_deaths.date.when_null_then(patients.date_of_death)
