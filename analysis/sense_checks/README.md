@@ -4,9 +4,11 @@ Within this folder is a series of scripts designed to check the restults of data
 
 ## The checks
 
-There are a series of files which contain the code and results for the following:
+There are is an R script which contains the code for the following:
 
-- frequency tables for all categorical variables;
-- histograms and / or summary statistics for continuous variables and dates;
-- check missing values (especially for things that shouldn't be missing);
-- compare dates, like checking the number of people with key event dates before birth / after death / after deregistration / etc.
+- Frequency tables for categorical variables;
+- Histograms for continuous variables and dates;
+- Proportions of missing values in variables with missingness;
+- Comparisons of date orders for date of death / deregistration / censoring
+
+Results of the checks are saved in the `output/sense_checks` folder.
