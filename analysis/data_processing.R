@@ -23,8 +23,8 @@ process_dataset <- function(period) {
 
   # filter the dataset to get the cohort of interest
   if (cohort == "older") {
+    # of individuals between 12 and 100, get those 60+
     df <- df %>% 
-      # of individuals between 12 and 100, get those 60+
       filter(age >= 60)
   } else {
     # of individuals between 12 and 100, get those 12-59
