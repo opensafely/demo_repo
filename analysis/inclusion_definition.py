@@ -63,3 +63,5 @@ inhaler_prescribed = (
 dataset.registered = registered_patients
 dataset.sex_known = sex_known
 dataset.inhaler_prescribed = inhaler_prescribed
+# get age for filtering cohorts
+dataset.age = patients.age_on(index_date)

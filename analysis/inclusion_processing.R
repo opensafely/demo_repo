@@ -9,8 +9,23 @@ source(here::here("analysis", "redaction.R"))
 # use a function to process the population
 process_population <- function(period) {
 
+    # get command line arguments
+    args <- commandArgs(trailingOnly = TRUE)
+    cohort <- args[[1]]
+
     # import the dataset
     patients_df <- read_feather(here::here("output", paste0("population_", period, ".arrow")))
+
+    # filter the dataset for the appropriate cohort
+    if (cohort == "older") {
+        # of individuals between 12 and 100, get those 60+
+        patients_df <- patients_df %>% 
+            filter(age >= 60)
+    } else {
+        # of individuals between 12 and 100, get those 12-59
+        patients_df <- patients_df %>% 
+            filter(age < 60)
+    }
 
     # define the base population for exclusion: only consider alive and appropriate age patients
     population <- patients_df %>%
@@ -39,7 +54,7 @@ process_population <- function(period) {
 
     # save the aggregated summary
     write_csv(population_summary, path = here::here(
-        "output", paste0("population_processed_", period, ".csv"))
+        "output", paste0("population_processed_", cohort, "_", period, ".csv"))
         )
 
 }

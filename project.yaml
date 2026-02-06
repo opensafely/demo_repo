@@ -38,17 +38,30 @@ actions:
       highly_sensitive:
         dataset: output/population_post_pandemic.arrow
 
-  # action which will agreggate and summarise the data from generate_population actions
-  # this is equivalent to running three separate aggregation actions which take command line arguments
-  process_population:
-    run: r:v2 analysis/inclusion_processing.R
+  # actions which will agreggate and summarise the data from generate_population actions
+  # this is equivalent to running six separate aggregation actions which take command line arguments
+  
+  ## older individuals
+  process_population_older:
+    run: r:v2 analysis/inclusion_processing.R older
     needs:
     - generate_population_pre_pandemic
     - generate_population_pandemic
     - generate_population_post_pandemic
     outputs:
       moderately_sensitive:
-        dataset: output/population_processed_*.csv
+        dataset: output/population_processed_older_*.csv
+    
+  ## younger individuals
+  process_population_younger:
+    run: r:v2 analysis/inclusion_processing.R younger
+    needs:
+    - generate_population_pre_pandemic
+    - generate_population_pandemic
+    - generate_population_post_pandemic
+    outputs:
+      moderately_sensitive:
+        dataset: output/population_processed_younger_*.csv
 
   # actions which creates dataset using ehrQL, will use user provided dummy tables from 'dummy_tables' folder
   # will also test the dataset definition automatically
