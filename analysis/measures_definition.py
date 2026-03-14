@@ -3,12 +3,11 @@ import json
 from pathlib import Path
 from datetime import datetime, date
 
-# import the necessary ehrQL functionalities
+# import the necessary ehrQL functionalities and tables
 from ehrql import create_measures, years, case, when, months, get_parameter
-# import the measures functionality
 from ehrql.measures import INTERVAL
-# import the necessary tables from TPP
 from ehrql.tables.tpp import patients, medications, ons_deaths, practice_registrations
+
 # import variables which are defined in a separate file
 from variable_lib import (
     has_a_continuous_practice_registration_spanning,
