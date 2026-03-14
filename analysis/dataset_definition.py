@@ -1,13 +1,15 @@
-# import the necessary ehrQL functionalities
+# import the necessary ehrQL functionalities and tables
 from ehrql import create_dataset, months, years, case, when, minimum_of
-# import the necessary tables from TPP
-from ehrql.tables.tpp import (
-    patients, medications,
+from ehrql.tables.core import (
+    patients, 
+    medications,
     clinical_events,
     ons_deaths,
-    practice_registrations,
-    addresses 
+    practice_registrations
 )
+# The addresses table must currently be imported specifically from TPP: https://docs.opensafely.org/ehrql/reference/schemas/
+from ehrql.tables.tpp import addresses
+
 # import variables which are defined in a separate file
 from variable_lib import ( 
     has_a_continuous_practice_registration_spanning,
