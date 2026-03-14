@@ -54,7 +54,7 @@ else :
     intervals_years = years(3).starting_on(index_date)
     intervals_months = months(36).starting_on(index_date) 
 
-# create ehrQL generated dummy measures
+# create ehrQL measures object for configuration
 measures = create_measures()
 
 # define the size of a dummy population
@@ -208,7 +208,7 @@ condition = (case(
     otherwise = "none"
 ))
 
-# define the patients with an inhaler of interest in the two years preceeing follow-up
+# define the patients with an inhaler of interest in the two years preceding follow-up
 inhaler_date = index_date - years(2)
 inhaler_prescribed = (
     medications.where(medications.dmd_code.is_in(codelists.salbutamol))
