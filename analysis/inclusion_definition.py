@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import datetime
 
 # import the necessary ehrQL functionalities and tables
-from ehrql import create_dataset, months, years
+from ehrql import create_dataset, months, years, get_parameter
 from ehrql.tables.core import patients, medications, ons_deaths
 
 # import variables which are defined in a separate file
