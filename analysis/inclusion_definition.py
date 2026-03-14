@@ -3,15 +3,15 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-# import the necessary ehrQL functionalities
-from ehrql import create_dataset, months, years, case, when, minimum_of, get_parameter
-# import the necessary tables from TPP
-from ehrql.tables.tpp import patients, medications, ons_deaths
+# import the necessary ehrQL functionalities and tables
+from ehrql import create_dataset, months, years
+from ehrql.tables.core import patients, medications, ons_deaths
+
 # import variables which are defined in a separate file
 from variable_lib import has_a_continuous_practice_registration_spanning
 import codelists
 
-# create ehrQL generated dummy dataset
+# create ehrQLdataset object for adding a population definition and data columns
 dataset = create_dataset() 
 
 # import study dates defined in "./analysis/design/study-dates.R" script and then exported
