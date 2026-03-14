@@ -2,8 +2,9 @@ version: '4.0'
 
 actions:
 
-  # action which creates a dataset using ehrQL, this is just for getting numbers of patients being
-  # included/excluded, this is not going to be tested and will use ehrQL generated dummy data
+  # action which creates a dataset using ehrQL; this is just for getting numbers of patients being
+  # included/excluded. This is not going to be tested and will use ehrQL generated dummy data when
+  # the pipeline is run locally.
   generate_population:
     run: >
       ehrql:v1 generate-dataset
@@ -22,8 +23,8 @@ actions:
       moderately_sensitive:
         dataset: output/population_processed.csv
 
-  # action which creates dataset using ehrQL, will use user provided dummy tables from 'dummy_tables' folder
-  # will also test the dataset definition automatically
+  # action which creates dataset using ehrQL, which will use user provided dummy tables from 'dummy_tables' folder
+  # when run locally. Adding the --test-data-file means that this action also tests the dataset definition automatically.
   generate_dataset:
     run: >
         ehrql:v1 generate-dataset
@@ -36,6 +37,7 @@ actions:
         population: output/dataset.arrow
 
   # action which will process the dataset from generate_dataset, so data is formatted as desired
+  # for downstream analysis
   process_dataset:
     run: r:v2 analysis/data_processing.R
     needs:
@@ -85,8 +87,10 @@ actions:
       moderately_sensitive:
         dataset: output/measures/measure_*.csv
 
-#  # action which generates plots of measures across conditions and age groups
-#  # this is an action you could use if visualisation was wanted to be in the secure server
+#  # action which generates plots of measures across conditions and age groups;
+#  # this is an action you could use if visualisation was wanted to be in the secure server.
+#  # Typically visualisations are done outside of the secure server for computational efficiency and
+#  # ease of re-running them.
 #  visualise_measures:
 #    run: r:v2 analysis/measures_visualisation.R
 #    needs:
