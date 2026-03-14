@@ -11,7 +11,7 @@ from ehrql.tables.core import patients, medications, ons_deaths
 from variable_lib import has_a_continuous_practice_registration_spanning
 import codelists
 
-# create ehrQLdataset object for adding a population definition and data columns
+# create ehrQL dataset object for adding a population definition and data columns
 dataset = create_dataset() 
 
 # import study dates defined in "./analysis/design/study-dates.R" script and then exported
