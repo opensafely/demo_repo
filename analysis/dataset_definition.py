@@ -13,15 +13,14 @@ from ehrql import (
     minimum_of,
     get_parameter
 )
-from ehrql.tables.core import (
+from ehrql.tables.tpp import (
     patients, 
     medications,
     clinical_events,
     ons_deaths,
-    practice_registrations
+    practice_registrations,
+    addresses
 )
-# The addresses table must currently be imported specifically from TPP: https://docs.opensafely.org/ehrql/reference/schemas/
-from ehrql.tables.tpp import addresses
 
 # import variables which are defined in a separate file
 from variable_lib import ( 
