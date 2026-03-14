@@ -1,6 +1,6 @@
 # import the necessary ehrQL functionalities and tables
 from ehrql import years, days
-from ehrql.tables.core import practice_registrations, clinical_events, medications 
+from ehrql.tables.tpp import practice_registrations, clinical_events, medications 
 
 # create a function to extract registrations which fully cover a given period
 def _registrations_overlapping_period(start_date, end_date):
