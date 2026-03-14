@@ -24,41 +24,12 @@ handler.setFormatter(
 logger.addHandler(handler)
 
 
-DEFAULT_CONFIG = {
-    "show_outer_percentiles": False,
-    "tables": {
-        "output": True,
-    },
-    "charts": {
-        "output": True,
-    },
-}
-
-CONFIG_SCHEMA = {
-    "type": "object",
-    "additionalProperties": False,
-    "properties": {
-        "show_outer_percentiles": {"type": "boolean"},
-        "tables": {
-            "type": "object",
-            "additionalProperties": False,
-            "properties": {
-                "output": {"type": "boolean"},
-            },
-        },
-        "charts": {
-            "type": "object",
-            "additionalProperties": False,
-            "properties": {
-                "output": {"type": "boolean"},
-            },
-        },
-    },
-}
-
+# This regex matches the outputs of the measures generation action, and allows us to loop over them in the
+# get_measure_tables function below.
 MEASURE_FNAME_REGEX = re.compile(r"measure_(?P<id>\w+)\.csv")
 
-
+# This function loops over the given list of input files and checks whether they correspond to the outputs from the previous action.
+# It then turns the measures data in the input files into Python objects, each with an 'id' corresponding to the file from which it was created.
 def get_measure_tables(input_files):
     for input_file in input_files:
         measure_fname_match = re.match(MEASURE_FNAME_REGEX, input_file.name)
@@ -76,10 +47,11 @@ def drop_zero_denominator_rows(measure_table):
     this practice will have a denominator of zero and, consequently, a ratio of inf.
     Depending on the implementation, this practice's ratio may be sorted as greater than
     other practices' ratios, which may increase the deciles.
-    """
+
     # It's non-trivial to identify the denominator column without the associated Measure
     # instance. It's much easier to test the value column for inf, which is returned by
     # Pandas when the second argument of a division operation is zero.
+    """
     is_not_inf = measure_table["ratio"] != numpy.inf
     num_is_inf = len(is_not_inf) - is_not_inf.sum()
     logger.info(f"Dropping {num_is_inf} zero-denominator rows")
@@ -114,6 +86,7 @@ def write_deciles_chart(deciles_chart, path, filename):
     deciles_chart.savefig(path / filename, bbox_inches="tight")
 
 
+# These are helper functions for writing and finding directories.
 def create_dir(path):
     pathlib.Path(path).mkdir(parents=True, exist_ok=True)
 
@@ -126,6 +99,41 @@ def match_paths(pattern):
     return [get_path(x) for x in glob.glob(pattern)]
 
 
+# The following defines some configuration for the deciles charts, and a schema against which to validate that 
+# configuration. The configuration can be overridden in part or whole by passing in a different value on the 
+# command line, but that value must match the schema defined here.
+CONFIG_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "show_outer_percentiles": {"type": "boolean"},
+        "tables": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "output": {"type": "boolean"},
+            },
+        },
+        "charts": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "output": {"type": "boolean"},
+            },
+        },
+    },
+}
+
+DEFAULT_CONFIG = {
+    "show_outer_percentiles": False,
+    "tables": {
+        "output": True,
+    },
+    "charts": {
+        "output": True,
+    },
+}
+
 def parse_config(config_json):
     user_config = json.loads(config_json)
     config = DEFAULT_CONFIG.copy()
@@ -136,7 +144,8 @@ def parse_config(config_json):
         raise argparse.ArgumentTypeError(e.message) from e
     return config
 
-
+# This function defines the behaviour of this file when acting as a script (as it will in the project pipeline)
+# in terms of the arguments it accepts.
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -159,7 +168,7 @@ def parse_args():
     )
     return parser.parse_args()
 
-
+# This function runs when the file is called as a script in the project pipeline.
 def main():
     args = parse_args()
     input_files = args.input_files
