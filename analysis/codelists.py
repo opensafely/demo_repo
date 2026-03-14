@@ -108,7 +108,7 @@ ast_review = codelist_from_csv(
     column = "code"
 )
 
-# ethnicity codes
+# ethnicity codes; see category columns here: https://www.opencodelists.org/codelist/opensafely/ethnicity-snomed-0removed/22911876/
 ethnicity_codes = codelist_from_csv(
   "codelists/opensafely-ethnicity-snomed-0removed.csv",
   column = "code",
